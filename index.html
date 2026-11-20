@@ -299,6 +299,37 @@ input[type="range"]{width:100%;margin-top:.75rem;accent-color:#D97706;min-height
 .form-actions .save:disabled{opacity:.6}
 .hidden{display:none!important}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:6rem;z-index:50;background:var(--text);color:var(--bg);font-size:13px;font-weight:600;border-radius:999px;padding:.65rem 1.1rem;box-shadow:0 10px 24px rgba(0,0,0,.25);max-width:92vw;text-align:center;line-height:1.5}
+/* ===== Notes ===== */
+.notes-panel{border-color:var(--jade)}
+@media (prefers-color-scheme: dark){.notes-panel{border-color:#065F46}}
+.notes-head{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem}
+.notes-head h3{font-size:17px}
+.badge-count{flex-shrink:0;font-size:11px;font-weight:800;background:var(--ok-bg);color:var(--ok-text);border:1px solid var(--ok-border);padding:.3rem .6rem;border-radius:999px;white-space:nowrap}
+.note-add-main{width:100%;margin-top:.9rem;background:var(--jade);color:#fff;border:none;border-radius:999px;padding:.85rem 1.2rem;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;gap:.4rem;min-height:3.2rem;box-shadow:0 8px 20px rgba(27,107,74,.22)}
+.note-add-main:active{transform:scale(.99)}
+.note-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.75rem}
+.note-list{display:flex;flex-direction:column;gap:.65rem;margin-top:1rem}
+.note-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:1rem;box-shadow:var(--shadow)}
+.note-card.reminding{background:var(--amber-bg);border-color:var(--amber-border)}
+.note-card-head{display:flex;align-items:flex-start;gap:.65rem}
+.note-ico{flex-shrink:0;width:42px;height:42px;border-radius:12px;background:var(--ok-bg);border:1px solid var(--ok-border);display:flex;align-items:center;justify-content:center;font-size:20px}
+.note-card-head h4{margin:0;font-size:15px;font-weight:800;line-height:1.4;word-break:break-word}
+.note-meta{font-size:11px;color:var(--dim);margin:.2rem 0 0;line-height:1.5}
+.note-content{font-size:14px;line-height:1.65;white-space:pre-wrap;word-break:break-word;margin:.6rem 0 0;color:var(--text)}
+.note-date-box{margin-top:.65rem;border:1px solid var(--border);background:var(--bg);border-radius:12px;padding:.65rem .75rem;font-size:13px;line-height:1.6}
+.note-date-box .lab{color:var(--dim)}
+.note-date-box .next{color:var(--jade);font-weight:700}
+.seg button.on-jade{background:var(--jade);color:#fff;box-shadow:var(--shadow)}
+.seg button.on-plain{background:var(--text);color:var(--bg);box-shadow:var(--shadow)}
+.seg button.on-mute{background:#78716C;color:#fff;box-shadow:var(--shadow)}
+.mode-help{font-size:12px;line-height:1.6;border-radius:12px;padding:.65rem .8rem;margin-top:.6rem}
+.mode-help.remind-on{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber-text)}
+.mode-help.remind-off{background:var(--bg);border:1px dashed var(--border);color:var(--dim)}
+.note-form-box{border:1px solid var(--border);border-radius:16px;padding:.9rem;background:var(--bg)}
+.note-form-box .bt{font-size:14px;font-weight:800;display:block}
+.note-remind-box{border:2px solid var(--amber-border);background:var(--amber-bg);border-radius:16px;padding:1rem}
+.note-remind-box .rt{font-size:14px;font-weight:800;display:block}
+.note-remind-box .rd{font-size:12px;color:var(--dim);margin:.3rem 0 0;line-height:1.6}
 </style>
 </head>
 <body>
@@ -317,7 +348,7 @@ input[type="range"]{width:100%;margin-top:.75rem;accent-color:#D97706;min-height
     </div>
   </div>
 
-  <div class="share-note">👋 <strong>Bản chia sẻ:</strong> Ai có link này cũng mở và dùng được sổ riêng của mình. Hãy thêm ngày đầu tiên của bạn bên dưới — ghi một lần, app tự báo lại <strong>mỗi năm</strong>. Dùng nút <strong>Sao lưu</strong> ở cuối trang để tải sổ của bạn thành file và khôi phục lại khi cần.</div>
+  <div class="share-note">👋 <strong>Bản chia sẻ:</strong> Ai có link này cũng mở và dùng được sổ riêng của mình. Hãy thêm ngày đầu tiên của bạn bên dưới — ghi một lần, app tự báo lại <strong>mỗi năm</strong>. Cần ghi nhớ điều gì thêm? Dùng mục <strong>📝 Ghi chú</strong> ở giữa trang: gắn ngày lịch + bật nhắc, hoặc chỉ lưu để nhớ mà không cần thông báo. Dùng nút <strong>Sao lưu</strong> ở cuối trang để tải sổ của bạn thành file và khôi phục lại khi cần.</div>
 
   <!-- Install to home screen -->
   <section class="panel install-panel" id="installPanel" aria-label="Cài app ra màn hình chính">
@@ -390,10 +421,43 @@ input[type="range"]{width:100%;margin-top:.75rem;accent-color:#D97706;min-height
   <!-- List -->
   <div id="listSlot"></div>
 
+  <!-- Notes -->
+  <section class="panel notes-panel" id="notesPanel" aria-label="Ghi chú">
+    <div class="notes-head">
+      <div>
+        <h3>📝 Ghi chú</h3>
+        <p class="desc">Ghi lại bất cứ điều gì cần nhớ. Mỗi ghi chú có thể <strong>gắn thêm ngày lịch</strong> (âm hoặc dương) để đếm ngược và <strong>bật nhắc nhở</strong> bằng thông báo / báo thức — hoặc <strong>chỉ lưu để nhớ, không thông báo</strong> gì cả.</p>
+      </div>
+      <span class="badge-count" id="noteCountBadge">0 ghi chú</span>
+    </div>
+    <button type="button" class="note-add-main" id="addNoteMainBtn" aria-label="Thêm ghi chú mới"><span style="font-size:20px;line-height:1">+</span> Thêm ghi chú</button>
+    <div class="note-stats" aria-label="Thống kê ghi chú">
+      <div class="stat"><p class="n" id="noteStatTotal">0</p><p class="t">Ghi chú đã lưu</p></div>
+      <div class="stat"><p class="n" style="color:#D97706" id="noteStatRemind">0</p><p class="t">Có nhắc nhở</p></div>
+      <div class="stat"><p class="n" id="noteStatPlain">0</p><p class="t">Chỉ lưu để nhớ</p></div>
+    </div>
+    <div class="filters" style="margin-top:1rem">
+      <div class="search">
+        <span class="ico" aria-hidden="true">🔍</span>
+        <input id="noteSearchInput" type="text" aria-label="Tìm kiếm ghi chú" placeholder="Tìm ghi chú theo tiêu đề, nội dung…" />
+      </div>
+      <div class="filter-line" role="group" aria-label="Lọc ghi chú">
+        <span class="lab">📝 Ghi chú:</span>
+        <div class="chips" id="noteFilterChips"></div>
+        <span class="cnt" id="noteFilteredCount"></span>
+      </div>
+    </div>
+    <div id="notesListSlot"></div>
+    <div class="btn-row hidden" id="noteIcsRow">
+      <button type="button" class="btn primary" id="downloadNotesIcsBtn">📅 Tải lịch nhắc cho ghi chú (.ics)</button>
+      <span class="hint11" style="margin:0;align-self:center">Đưa các ghi chú có nhắc vào Lịch điện thoại để chuông / thông báo kêu đúng giờ bạn đã chọn.</span>
+    </div>
+  </section>
+
   <!-- Backup -->
   <section class="panel" aria-label="Sao lưu và khôi phục sổ của bạn">
     <h3>💾 Sao lưu sổ của bạn</h3>
-    <p class="desc">Tải sổ thành một file để giữ riêng hoặc gửi cho người thân, và khôi phục lại từ file đó bất cứ lúc nào. File lịch .ics ở trên dùng để đưa lời nhắc vào Lịch điện thoại; file sao lưu này dùng để mang theo toàn bộ sổ.</p>
+    <p class="desc">Tải sổ thành một file để giữ riêng hoặc gửi cho người thân, và khôi phục lại từ file đó bất cứ lúc nào — file sao lưu gồm <strong>cả ngày cần nhớ lẫn ghi chú</strong>. File lịch .ics dùng để đưa lời nhắc vào Lịch điện thoại; file sao lưu này dùng để mang theo toàn bộ sổ.</p>
     <div class="btn-row">
       <button type="button" class="btn" id="exportJsonBtn">⬇️ Tải file sao lưu (.json)</button>
       <label class="btn" for="importFile" style="cursor:pointer">⬆️ Khôi phục từ file</label>
@@ -402,7 +466,7 @@ input[type="range"]{width:100%;margin-top:.75rem;accent-color:#D97706;min-height
     <p class="hint11" id="backupMsg" role="status"></p>
   </section>
 
-  <p class="foot">Âm lịch được quy đổi theo lịch Việt Nam (múi giờ UTC+7). Mặc định mọi ngày đều báo lại <strong>mỗi năm</strong> — bạn chỉ cần ghi một lần. Tháng nhuận được ẩn trong “Tuỳ chọn nâng cao” khi thêm ngày âm lịch, hầu hết các ngày không cần tới. Mỗi ngày đều chọn được cả ngày lẫn giờ, không có giờ nhắc mặc định — bạn tự chọn giờ cho từng ngày, nhắc trước 1, 2, 3, 4 ngày hay bất kỳ số ngày nào (0–60), bằng thông báo, báo thức hoặc cả hai. Tải file lịch .ics về mở bằng Lịch trên điện thoại để chuông kêu thật vào giờ bạn đã chọn.</p>
+  <p class="foot">Âm lịch được quy đổi theo lịch Việt Nam (múi giờ UTC+7). Mặc định mọi ngày đều báo lại <strong>mỗi năm</strong> — bạn chỉ cần ghi một lần. Tháng nhuận được ẩn trong “Tuỳ chọn nâng cao” khi thêm ngày âm lịch, hầu hết các ngày không cần tới. Mỗi ngày đều chọn được cả ngày lẫn giờ, không có giờ nhắc mặc định — bạn tự chọn giờ cho từng ngày, nhắc trước 1, 2, 3, 4 ngày hay bất kỳ số ngày nào (0–60), bằng thông báo, báo thức hoặc cả hai. Tải file lịch .ics về mở bằng Lịch trên điện thoại để chuông kêu thật vào giờ bạn đã chọn. Mục <strong>Ghi chú</strong> hoạt động độc lập: ghi chú gắn ngày dùng chung bộ quy đổi âm/dương và cách nhắc ở trên; ghi chú để “chỉ lưu để nhớ” thì không tạo lời nhắc nào.</p>
 </div>
 
 <!-- Form modal -->
@@ -558,6 +622,155 @@ input[type="range"]{width:100%;margin-top:.75rem;accent-color:#D97706;min-height
       <div class="form-actions">
         <button type="button" class="cancel" id="formCancel">Huỷ</button>
         <button type="button" class="save" id="formSave">Lưu ngày này</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Note form modal -->
+<div class="overlay hidden" id="noteOverlay" role="dialog" aria-modal="true" aria-label="Thêm hoặc sửa ghi chú">
+  <div class="scrim" id="noteScrim"></div>
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2 id="noteFormTitle">Thêm ghi chú</h2>
+      <button type="button" class="close" id="noteFormClose" aria-label="Đóng">✕</button>
+    </div>
+    <div class="sheet-body">
+      <p class="guide">✦ Viết ghi chú tự do như một cuốn sổ tay. Nếu muốn, <strong>gắn thêm ngày lịch</strong> ở bước 2 và <strong>bật nhắc nhở</strong> ở bước 3 — còn không, cứ để mặc định là ghi chú <strong>chỉ lưu để nhớ, không thông báo</strong>.</p>
+
+      <div class="field">
+        <label for="n-title">1 · Tiêu đề ghi chú</label>
+        <input id="n-title" type="text" placeholder="VD: Việc cần chuẩn bị, Ý tưởng, Số điện thoại thợ…" />
+        <p class="hint">Có thể để trống tiêu đề — app sẽ lấy dòng đầu của nội dung làm tiêu đề.</p>
+      </div>
+
+      <div class="field">
+        <label for="n-content">Nội dung ghi chú <span style="color:var(--accent)">*</span></label>
+        <textarea id="n-content" rows="5" placeholder="Viết điều bạn cần nhớ vào đây… VD: Mua hoa lan trước 2 ngày, chuẩn bị mâm cơm, gọi điện cho cô Ba…"></textarea>
+      </div>
+
+      <!-- Attach date -->
+      <div class="note-form-box">
+        <span class="bt">2 · Gắn ngày lịch cho ghi chú này?</span>
+        <p class="hint" style="margin-top:.3rem">Gắn ngày để ghi chú hiện đếm ngược “còn bao nhiêu ngày” và có thể bật nhắc ở bước 3. Không gắn ngày thì ghi chú chỉ nằm yên trong sổ.</p>
+        <div class="seg" role="group" aria-label="Gắn ngày lịch hay không" style="margin-top:.6rem">
+          <button type="button" id="nSegNoDate" aria-pressed="true">📝 Không gắn ngày</button>
+          <button type="button" id="nSegHasDate" aria-pressed="false">📅 Có gắn ngày</button>
+        </div>
+
+        <div id="noteDateFields" class="hidden" style="margin-top:1rem">
+          <div class="field" style="margin-bottom:0">
+            <span class="flab">Ngày này tính theo lịch nào?</span>
+            <div class="seg" role="group" aria-label="Chọn loại lịch cho ghi chú">
+              <button type="button" id="nSegSolar" aria-pressed="true">☀️ Dương lịch</button>
+              <button type="button" id="nSegLunar" aria-pressed="false">🌙 Âm lịch</button>
+            </div>
+            <p class="hint" id="noteCalHint"></p>
+          </div>
+
+          <div class="field" style="margin-top:.9rem;margin-bottom:0">
+            <span class="flab" id="noteDateLabel">Ngày / tháng / năm / giờ</span>
+            <div class="grid3">
+              <div><label class="sub-lab" for="n-day">Ngày</label><select id="n-day" aria-label="Ngày của ghi chú"></select></div>
+              <div><label class="sub-lab" for="n-month">Tháng</label><select id="n-month" aria-label="Tháng của ghi chú"></select></div>
+              <div><label class="sub-lab" for="n-year">Năm (có thể bỏ trống)</label><input id="n-year" type="number" inputmode="numeric" placeholder="—" aria-label="Năm của ghi chú" /></div>
+            </div>
+            <p class="hint11">Điền năm = ghi chú gắn với đúng ngày đó một lần. Bỏ trống năm + chọn “Mỗi năm” ở dưới = ngày này lặp lại hằng năm.</p>
+
+            <div class="time-box">
+              <div class="time-row">
+                <label class="tl" for="n-event-time">🕐 Giờ diễn ra</label>
+                <input id="n-event-time" type="time" aria-label="Giờ diễn ra của ghi chú — bạn tự chọn, không có giờ mặc định" />
+                <button type="button" class="btn sm hidden" id="nClearEventTime">Để cả ngày ✕</button>
+                <span class="state-tag" id="nEventTimeState">Chưa chọn giờ — đang để cả ngày</span>
+              </div>
+              <div class="quick" id="noteEventTimeQuick" role="group" aria-label="Chọn nhanh giờ diễn ra cho ghi chú"></div>
+            </div>
+
+            <div id="noteLeapWrap" class="hidden">
+              <button type="button" class="link-btn" id="noteAdvToggle" aria-expanded="false">▸ Tuỳ chọn nâng cao (tháng nhuận — thường không cần)</button>
+              <div class="adv-box hidden" id="noteAdvBox">
+                <label>
+                  <input type="checkbox" id="n-leap" aria-label="Đây là tháng nhuận (ghi chú)" />
+                  <span><span class="at">Đây là tháng nhuận</span><span class="ad">Chỉ tick khi ngày âm ghi rõ là tháng nhuận. Không nhớ thì cứ để trống.</span></span>
+                </label>
+              </div>
+            </div>
+
+            <div style="margin-top:.75rem">
+              <span style="font-size:12px;font-weight:700;color:var(--dim)">Ngày này có lặp lại không?</span>
+              <div class="seg3" id="noteRepeatSeg" role="group" aria-label="Ghi chú lặp lại: chỉ một lần hoặc mỗi năm" style="margin-top:.5rem"></div>
+              <p class="hint11" id="noteRepeatHint"></p>
+            </div>
+
+            <div class="preview hidden" id="noteFormPreview">
+              <p class="k">Xem trước quy đổi</p>
+              <p id="notePreviewLunar"></p>
+              <p id="notePreviewSolar"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reminder toggle -->
+      <div class="note-remind-box">
+        <span class="rt">3 · Có cần thông báo nhắc không?</span>
+        <p class="rd">Chọn <strong>“Chỉ lưu để nhớ”</strong> nếu bạn chỉ muốn cất ghi chú trong sổ — không chuông, không thông báo. Chọn <strong>“Có nhắc nhở”</strong> để app nhắc nhỏ trước ngày đã gắn, giống các ngày cần nhớ.</p>
+        <div class="seg" role="group" aria-label="Bật nhắc nhở hay chỉ lưu để nhớ" style="margin-top:.7rem;background:var(--surface)">
+          <button type="button" id="nSegNoRemind" aria-pressed="true">🔕 Chỉ lưu để nhớ</button>
+          <button type="button" id="nSegRemind" aria-pressed="false">🔔 Có nhắc nhở</button>
+        </div>
+        <p class="mode-help remind-off" id="noteModeHelp">🔕 Đang để <strong>chỉ lưu để nhớ</strong> — ghi chú sẽ không phát thông báo nào. Bạn mở sổ ra là thấy.</p>
+
+        <div id="noteRemindFields" class="hidden">
+          <p class="err hidden" id="noteRemindNoDate" role="alert" style="margin-top:.75rem">Muốn bật nhắc, hãy gắn ngày lịch ở bước 2 trước — nhắc nhở cần một ngày cụ thể để tính ngày nhắc.</p>
+          <div id="noteRemindControls">
+            <div style="margin-top:.75rem">
+              <span style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)">Nhắc trước bao nhiêu ngày — chọn nhanh</span>
+              <div class="quick" id="noteRemindPresets" role="group" aria-label="Chọn nhanh số ngày nhắc trước cho ghi chú" style="margin-top:.5rem"></div>
+            </div>
+            <div class="inner-box">
+              <label class="il" for="n-remind-custom">Hoặc tự chọn số ngày nhắc trước</label>
+              <div class="stepper">
+                <button type="button" class="st" id="noteRemindMinus" aria-label="Giảm 1 ngày nhắc (ghi chú)">−</button>
+                <div class="mid">
+                  <input id="n-remind-custom" type="number" inputmode="numeric" aria-label="Số ngày nhắc trước tuỳ chọn cho ghi chú" value="1" />
+                  <span class="unit">ngày trước</span>
+                </div>
+                <button type="button" class="st" id="noteRemindPlus" aria-label="Tăng 1 ngày nhắc (ghi chú)">+</button>
+              </div>
+              <input type="range" id="noteRemindRange" min="0" max="30" step="1" value="1" aria-label="Trượt để chọn số ngày nhắc trước cho ghi chú" />
+              <div class="range-labs"><span>Đúng ngày</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>7</span><span>10</span><span>14</span><span>30 ngày</span></div>
+            </div>
+            <div class="inner-box">
+              <span class="il">Nhắc bằng cách nào?</span>
+              <div class="seg3" id="noteMethodSeg" role="group" aria-label="Chọn cách nhắc cho ghi chú" style="margin-top:.5rem"></div>
+              <p class="hint11" id="noteMethodHint"></p>
+              <div style="margin-top:.75rem">
+                <div class="time-row">
+                  <label class="tl" for="n-remind-time">Giờ nhắc <span style="color:var(--accent)">*</span></label>
+                  <input id="n-remind-time" type="time" aria-label="Giờ nhắc cho ghi chú — bạn tự chọn, không có giờ mặc định" />
+                  <span class="state-tag warn" id="noteRemindTimeState">Chưa chọn giờ — hãy chọn giờ của bạn</span>
+                </div>
+                <p class="hint11">Không có giờ mặc định — bạn tự chọn giờ nhắc. Sau khi lưu, dùng nút “📅 Lịch nhắc” trên thẻ ghi chú để đưa vào Lịch điện thoại.</p>
+                <div class="quick" id="noteRemindTimeQuick" role="group" aria-label="Chọn nhanh giờ nhắc cho ghi chú"></div>
+              </div>
+            </div>
+            <div class="remind-preview hidden" id="noteRemindPreview">
+              <p class="k">Xem trước nhắc nhở cho ghi chú này</p>
+              <p id="nrpNext"></p>
+              <p id="nrpDate"></p>
+              <p id="nrpMethod"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="err hidden" id="noteFormError" role="alert"></p>
+
+      <div class="form-actions">
+        <button type="button" class="cancel" id="noteFormCancel">Huỷ</button>
+        <button type="button" class="save" id="noteFormSave" style="background:var(--jade);color:#fff">Lưu ghi chú</button>
       </div>
     </div>
   </div>
@@ -839,6 +1052,25 @@ var deleteConfirmId = null, showPast = false;
 var editingId = null;
 var form = null;
 var showAdvanced = false, showRepeatOptions = false;
+/* Notes state */
+var notes = [];
+var nextNoteId = 1;
+var noteSearch = "", noteFilter = "all";
+var noteDeleteConfirmId = null;
+var editingNoteId = null;
+var noteForm = null;
+var noteShowAdvanced = false;
+var NOTE_FILTERS = [
+  { id: "all", label: "Tất cả" },
+  { id: "remind", label: "🔔 Có nhắc" },
+  { id: "plain", label: "🔕 Chỉ lưu để nhớ" },
+  { id: "dated", label: "📅 Có gắn ngày" },
+  { id: "undated", label: "📝 Không gắn ngày" }
+];
+var NOTE_REPEAT_OPTIONS = [
+  { id: "none", label: "Chỉ một lần", icon: "1️⃣", hint: "Chỉ tính cho đúng ngày đã gắn (cần điền năm)." },
+  { id: "yearly", label: "Mỗi năm", icon: "🎂", hint: "Ngày này lặp lại mỗi năm — hợp ghi chú giỗ, sinh nhật, việc hằng năm." }
+];
 var notifPerm = (typeof window !== "undefined" && "Notification" in window) ? Notification.permission : "unsupported";
 var firedNotifs = {};
 
@@ -883,6 +1115,61 @@ function applyFilters(list){
     out = out.filter(function(x){ return x.ev.title.toLowerCase().indexOf(q)>=0 || (x.ev.note||"").toLowerCase().indexOf(q)>=0; });
   }
   return out;
+}
+
+/* ============ Notes helpers ============ */
+function noteDisplayTitle(n){
+  if (n.title && n.title.trim()) return n.title.trim();
+  var first = String(n.content || "").split("\n")[0].trim();
+  if (first.length > 60) first = first.slice(0, 60) + "…";
+  return first || "Ghi chú không tiêu đề";
+}
+function noteAsEvent(n){
+  if (!n.hasDate) return null;
+  return { calendarType: n.calendarType, day: n.day, month: n.month, year: n.year, isLeapMonth: n.isLeapMonth, isRecurring: n.repeatType === "yearly" ? 1 : 0, repeatType: n.repeatType || "none", eventTime: n.eventTime };
+}
+function enrichNote(n){
+  var pseudo = noteAsEvent(n);
+  var next = null;
+  if (pseudo){ try { next = getNextOccurrence(pseudo); } catch(e){ next = null; } }
+  var reminder = null;
+  if (n.hasReminder && next) reminder = getReminderInfo(next, n.remindDays);
+  var counterpartSolar = "", counterpartLunar = "";
+  if (n.hasDate){
+    if (n.calendarType === "solar"){
+      counterpartSolar = n.year ? formatSolar({ day: n.day, month: n.month, year: n.year }) : pad2(n.day) + "/" + pad2(n.month);
+      var ry = n.year || new Date().getFullYear();
+      try { var l2 = solarToLunar(n.day, n.month, ry); counterpartLunar = l2.day + "/" + l2.month + "/" + l2.year + (l2.leap ? " nhuận" : "") + " ÂL"; } catch(e){ counterpartLunar = "—"; }
+    } else {
+      counterpartLunar = n.day + "/" + n.month + (n.isLeapMonth ? " nhuận" : "") + (n.year ? "/" + n.year : "") + " ÂL";
+      var ry2 = n.year || getTodayInfo().lunar.year;
+      try { var s2 = lunarToSolar(n.day, n.month, ry2, n.isLeapMonth === 1); counterpartSolar = s2.year ? formatSolar(s2) : "—"; } catch(e){ counterpartSolar = "—"; }
+    }
+  }
+  return { note: n, next: next, reminder: reminder, counterpartSolar: counterpartSolar, counterpartLunar: counterpartLunar };
+}
+function allEnrichedNotes(){ return notes.map(enrichNote); }
+function applyNoteFilters(list){
+  var out = list;
+  if (noteFilter === "remind") out = out.filter(function(x){ return x.note.hasReminder; });
+  else if (noteFilter === "plain") out = out.filter(function(x){ return !x.note.hasReminder; });
+  else if (noteFilter === "dated") out = out.filter(function(x){ return x.note.hasDate; });
+  else if (noteFilter === "undated") out = out.filter(function(x){ return !x.note.hasDate; });
+  if (noteSearch.trim()){
+    var q = noteSearch.trim().toLowerCase();
+    out = out.filter(function(x){ return noteDisplayTitle(x.note).toLowerCase().indexOf(q) >= 0 || (x.note.content || "").toLowerCase().indexOf(q) >= 0; });
+  }
+  return out;
+}
+function buildIcsForNote(n, item){
+  if (!n.hasReminder || !item || !item.next || !item.reminder || item.next.daysUntil < 0) return null;
+  var pseudoEv = { id: "note-" + n.id, title: "📝 " + noteDisplayTitle(n), note: n.content || "", remindDays: n.remindDays, remindMethod: n.remindMethod, remindTime: n.remindTime, repeatType: n.repeatType === "yearly" ? "yearly" : "none", eventTime: n.eventTime };
+  return buildIcsForEvent(pseudoEv, item.next, item.reminder);
+}
+function formatNoteStamp(ts){
+  if (!ts) return "";
+  var d = new Date(ts);
+  return pad2(d.getDate()) + "/" + pad2(d.getMonth() + 1) + "/" + d.getFullYear();
 }
 
 /* ============ Rendering ============ */
@@ -977,6 +1264,115 @@ function eventCardHTML(item){
   }
   h += '</div></div></article>';
   return h;
+}
+function noteCardHTML(item){
+  var n = item.note, next = item.next, reminder = item.reminder;
+  var isReminding = !!(reminder && reminder.isInWindow);
+  var isToday = !!(next && next.daysUntil === 0);
+  var h = '<article class="note-card' + (isReminding ? " reminding" : "") + '">';
+  h += '<div class="note-card-head"><div class="note-ico" aria-hidden="true">📝</div><div style="min-width:0;flex:1"><h4>' + esc(noteDisplayTitle(n)) + '</h4>';
+  h += '<p class="note-meta">Lưu ngày ' + esc(formatNoteStamp(n.createdAt)) + (n.updatedAt && n.updatedAt !== n.createdAt ? ' • Sửa ' + esc(formatNoteStamp(n.updatedAt)) : '') + '</p></div>';
+  if (next && next.daysUntil >= 0) h += '<span class="count-pill' + (isToday ? " today" : next.daysUntil <= 7 ? " soon" : "") + '">' + esc(countdownLabel(next.daysUntil)) + '</span>';
+  h += '</div>';
+  if (n.content) h += '<p class="note-content">' + esc(n.content) + '</p>';
+  h += '<div class="tags">';
+  if (n.hasDate) h += '<span class="tag">📅 ' + (n.calendarType === "lunar" ? "Âm lịch " + n.day + "/" + n.month + (n.isLeapMonth ? " nhuận" : "") : "Dương lịch " + pad2(n.day) + "/" + pad2(n.month)) + (n.year ? "/" + n.year : "") + '</span>';
+  else h += '<span class="tag dashed">📝 Không gắn ngày</span>';
+  if (n.hasDate) h += '<span class="tag">🔁 ' + (n.repeatType === "yearly" ? "Mỗi năm" : "Chỉ một lần") + '</span>';
+  if (n.eventTime) h += '<span class="tag">🕐 ' + esc(n.eventTime) + '</span>';
+  if (n.hasReminder) h += '<span class="tag" style="background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber-text)">🔔 Có nhắc — ' + esc(remindLabel(n.remindDays).toLowerCase()) + '</span>';
+  else h += '<span class="tag dashed">🔕 Chỉ lưu để nhớ — không thông báo</span>';
+  h += '</div>';
+  if (n.hasDate){
+    h += '<div class="note-date-box"><div><span class="lab">Ngày gắn:</span> <strong>' + esc(n.calendarType === "solar" ? item.counterpartSolar + " (dương)" : item.counterpartLunar) + '</strong>' + (n.eventTime ? ' lúc <strong>' + esc(n.eventTime) + '</strong>' : '') + '</div>';
+    h += '<div><span class="lab">Quy đổi:</span> ' + esc(n.calendarType === "solar" ? item.counterpartLunar : item.counterpartSolar + " (dương)") + '</div>';
+    if (next && next.daysUntil >= 0) h += '<div class="next">Lần tới: ' + formatSolar(next.solar) + ' (' + (WEEKDAYS[next.date.getDay()] || "") + ') • Âm ' + next.lunar.day + '/' + next.lunar.month + '/' + next.lunar.year + (next.lunar.leap ? " nhuận" : "") + '</div>';
+    if (next && next.daysUntil < 0) h += '<div style="color:var(--dim)">Ngày đã qua: ' + formatSolar(next.solar) + '</div>';
+    if (!next) h += '<div style="color:var(--dim)">Chưa tính được ngày tới — hãy kiểm tra lại ngày / năm đã gắn.</div>';
+    h += '</div>';
+  }
+  if (n.hasReminder && next && next.daysUntil >= 0 && reminder){
+    var rbCls = "remind-box" + (reminder.isReminderToday ? " hot" : reminder.isInWindow ? " warm" : "");
+    var status;
+    if (isToday) status = n.remindDays === 0 ? "Hôm nay là ngày của ghi chú — nhắc đúng ngày như bạn đã chọn." : "Hôm nay là ngày của ghi chú!";
+    else if (reminder.isReminderToday) status = "⏰ Hôm nay là ngày nhắc của ghi chú này!";
+    else if (reminder.isInWindow) status = "Đã qua ngày nhắc (" + reminder.reminderSolarStr + ") — đang trong thời gian chuẩn bị, còn " + next.daysUntil + " ngày nữa.";
+    else if (reminder.daysToReminder === 1) status = "Ngày mai sẽ đến ngày nhắc.";
+    else status = "Còn " + reminder.daysToReminder + " ngày nữa đến ngày nhắc.";
+    h += '<div class="' + rbCls + '"><div class="row"><span class="pill-sm">🔔 ' + esc(remindLabel(n.remindDays)) + '</span><span style="font-weight:600">Ngày nhắc: ' + reminder.reminderSolarStr + ' (' + reminder.reminderWeekday + ')</span><span class="pill-sm2">' + methodMeta(n.remindMethod).icon + ' ' + esc(methodLabel(n.remindMethod)) + (n.remindTime ? ' • ' + esc(n.remindTime) : ' • Chưa chọn giờ') + '</span></div><p class="status">' + esc(status) + '</p></div>';
+  }
+  if (noteDeleteConfirmId === n.id){
+    h += '<div class="confirm"><span>Xoá ghi chú này?</span><button type="button" class="btn sm" data-nact="cancel-del" data-nid="' + n.id + '">Huỷ</button><button type="button" class="btn sm danger" data-nact="confirm-del" data-nid="' + n.id + '">Xoá</button></div>';
+  } else {
+    h += '<div class="card-actions"><button type="button" class="btn sm" data-nact="edit" data-nid="' + n.id + '" aria-label="Sửa ghi chú ' + esc(noteDisplayTitle(n)) + '">✏️ Sửa</button>';
+    if (n.hasReminder && next && next.daysUntil >= 0 && reminder) h += '<button type="button" class="btn sm amber" data-nact="ics" data-nid="' + n.id + '">📅 Lịch nhắc</button>';
+    if (n.hasReminder) h += '<button type="button" class="btn sm" data-nact="mute" data-nid="' + n.id + '">🔕 Tắt nhắc — chỉ lưu</button>';
+    else if (n.hasDate) h += '<button type="button" class="btn sm" data-nact="edit" data-nid="' + n.id + '">🔔 Bật nhắc…</button>';
+    h += '<button type="button" class="btn sm danger" data-nact="del" data-nid="' + n.id + '" aria-label="Xoá ghi chú ' + esc(noteDisplayTitle(n)) + '">🗑️ Xoá</button></div>';
+  }
+  h += '</article>';
+  return h;
+}
+function renderNotes(){
+  var badge = $("noteCountBadge"); if (!badge) return;
+  var enrichedAll = allEnrichedNotes();
+  var filtered = applyNoteFilters(enrichedAll);
+  /* Keep insertion order: pinned-by-reminder first? Keep newest first for plain list feel, but upcoming dated notes sorted by countdown inside dated group is confusing — keep newest first overall. */
+  filtered = filtered.slice().sort(function(a, b){ return (b.note.updatedAt || 0) - (a.note.updatedAt || 0); });
+  var withRemind = enrichedAll.filter(function(x){ return x.note.hasReminder; }).length;
+  badge.textContent = notes.length + " ghi chú";
+  $("noteStatTotal").textContent = notes.length;
+  $("noteStatRemind").textContent = withRemind;
+  $("noteStatPlain").textContent = notes.length - withRemind;
+  $("noteFilteredCount").textContent = filtered.length + " ghi chú";
+  /* Filter chips */
+  var fc = $("noteFilterChips"); fc.innerHTML = "";
+  NOTE_FILTERS.forEach(function(o){
+    var b = document.createElement("button"); b.type = "button"; b.className = "chip sm" + (noteFilter === o.id ? " on-dark" : "");
+    b.setAttribute("aria-pressed", noteFilter === o.id ? "true" : "false"); b.textContent = o.label;
+    b.addEventListener("click", function(){ noteFilter = o.id; renderNotes(); });
+    fc.appendChild(b);
+  });
+  /* ICS row for notes */
+  var exportableNotes = enrichedAll.filter(function(x){ return x.note.hasReminder && x.next && x.reminder && x.next.daysUntil >= 0; });
+  $("noteIcsRow").classList.toggle("hidden", exportableNotes.length === 0);
+  var dnb = $("downloadNotesIcsBtn");
+  if (dnb) dnb.textContent = "📅 Tải lịch nhắc cho ghi chú (.ics) — " + exportableNotes.length + " ghi chú";
+  /* List */
+  var ls = $("notesListSlot");
+  if (filtered.length === 0){
+    var isSearching = !!(noteSearch.trim() || noteFilter !== "all");
+    var lh = '<div class="empty-list" style="margin-top:1rem"><p class="ico">📝</p><p class="t">' + (notes.length === 0 ? "Chưa có ghi chú nào" : isSearching ? "Không tìm thấy ghi chú nào khớp" : "Chưa có ghi chú nào") + '</p><p class="d">' + (notes.length === 0 ? "Viết ghi chú đầu tiên của bạn — gắn ngày lịch để được nhắc, hoặc chỉ lưu yên trong sổ để nhớ." : "Thử đổi từ khoá hoặc bộ lọc khác nhé.") + '</p>';
+    if (notes.length === 0) lh += '<div class="btn-row" style="justify-content:center"><button type="button" class="btn primary" id="emptyAddNoteBtn" style="background:var(--jade);border-color:var(--jade);color:#fff">+ Viết ghi chú đầu tiên</button></div>';
+    lh += '</div>';
+    ls.innerHTML = lh;
+    var ea = $("emptyAddNoteBtn"); if (ea) ea.addEventListener("click", openAddNote);
+  } else {
+    var out = '<div class="note-list">';
+    filtered.forEach(function(item){ out += noteCardHTML(item); });
+    out += '</div>';
+    ls.innerHTML = out;
+  }
+  bindNoteActions();
+}
+function bindNoteActions(){
+  document.querySelectorAll("[data-nact]").forEach(function(el){
+    if (el.dataset.nbound) return; el.dataset.nbound = "1";
+    el.addEventListener("click", function(){
+      var id = Number(el.getAttribute("data-nid")), act = el.getAttribute("data-nact");
+      var n = null; for (var i = 0; i < notes.length; i++) if (notes[i].id === id) n = notes[i];
+      if (!n) return;
+      if (act === "edit") openEditNote(n);
+      else if (act === "del"){ noteDeleteConfirmId = id; renderNotes(); }
+      else if (act === "cancel-del"){ noteDeleteConfirmId = null; renderNotes(); }
+      else if (act === "confirm-del"){ notes = notes.filter(function(x){ return x.id !== id; }); noteDeleteConfirmId = null; renderNotes(); showToast("Đã xoá ghi chú."); }
+      else if (act === "mute"){ n.hasReminder = false; n.updatedAt = Date.now(); renderNotes(); showToast("Đã tắt nhắc — ghi chú này giờ chỉ lưu để nhớ."); }
+      else if (act === "ics"){
+        var item = enrichNote(n); var v = buildIcsForNote(n, item);
+        if (v){ downloadIcs("nhac-ghi-chu-" + n.id + ".ics", [v]); showToast("Đã tải file lịch nhắc cho ghi chú — mở bằng ứng dụng Lịch trên điện thoại nhé."); }
+      }
+    });
+  });
 }
 function render(){
   renderToday();
@@ -1085,6 +1481,7 @@ function render(){
     var pt = $("pastToggle"); if (pt) pt.addEventListener("click", function(){ showPast = !showPast; render(); });
   }
   bindCardActions();
+  renderNotes();
   checkBrowserNotifications(enrichedAll);
 }
 function bindCardActions(){
@@ -1122,8 +1519,22 @@ function checkBrowserNotifications(enrichedAll){
     firedNotifs[key] = true;
     try { new Notification("🔔 Nhắc: "+ev.title, { body: "Hôm nay là ngày nhắc — sự kiện diễn ra "+formatSolar(next.solar)+" ("+remindLabel(ev.remindDays).toLowerCase()+")." }); } catch(e){}
   });
+  /* Notes with reminders fire the same in-page notification */
+  try {
+    allEnrichedNotes().forEach(function(item){
+      var n = item.note, next = item.next, reminder = item.reminder;
+      if (!n.hasReminder || !next || !reminder) return;
+      if (n.remindMethod === "alarm") return;
+      if (!reminder.isReminderToday) return;
+      if (n.remindTime && n.remindTime > hhmm) return;
+      var key = "note-" + n.id + "-" + reminder.reminderSolarStr;
+      if (firedNotifs[key]) return;
+      firedNotifs[key] = true;
+      try { new Notification("📝 Nhắc ghi chú: " + noteDisplayTitle(n), { body: "Hôm nay là ngày nhắc của ghi chú — ngày gắn " + formatSolar(next.solar) + " (" + remindLabel(n.remindDays).toLowerCase() + ")." }); } catch(e){}
+    });
+  } catch(e){}
 }
-setInterval(function(){ if (events.length) checkBrowserNotifications(allEnriched()); }, 60000);
+setInterval(function(){ if (events.length || notes.length) checkBrowserNotifications(allEnriched()); }, 60000);
 
 /* ============ Form ============ */
 function buildFormStatic(){
@@ -1303,13 +1714,223 @@ function handleSave(){
   closeForm(); render();
 }
 
+/* ============ Note form ============ */
+function emptyNoteForm(){
+  var now = new Date();
+  return { title: "", content: "", hasDate: false, calendarType: "solar", day: now.getDate(), month: now.getMonth() + 1, year: String(now.getFullYear()), eventTime: "", isLeapMonth: false, repeatType: "none", hasReminder: false, remindDays: 1, remindMethod: "both", remindTime: "" };
+}
+function noteToForm(n){
+  return { title: n.title || "", content: n.content || "", hasDate: !!n.hasDate, calendarType: n.calendarType || "solar", day: n.day || new Date().getDate(), month: n.month || (new Date().getMonth() + 1), year: n.year ? String(n.year) : "", eventTime: n.eventTime || "", isLeapMonth: n.isLeapMonth === 1, repeatType: n.repeatType || "none", hasReminder: !!n.hasReminder, remindDays: typeof n.remindDays === "number" ? n.remindDays : 1, remindMethod: n.remindMethod || "both", remindTime: n.remindTime || "" };
+}
+function buildNoteFormStatic(){
+  var daySel = $("n-day"); daySel.innerHTML = "";
+  for (var d = 1; d <= 31; d++){ var od = document.createElement("option"); od.value = d; od.textContent = d; daySel.appendChild(od); }
+  var monSel = $("n-month"); monSel.innerHTML = "";
+  for (var m = 1; m <= 12; m++){ var om = document.createElement("option"); om.value = m; om.textContent = m; monSel.appendChild(om); }
+  var eq = $("noteEventTimeQuick"); eq.innerHTML = "";
+  ["07:00","08:00","09:00","11:30","18:00","19:00"].forEach(function(t){
+    var b = document.createElement("button"); b.type = "button"; b.textContent = t; b.dataset.time = t; b.setAttribute("aria-label", "Chọn giờ diễn ra cho ghi chú " + t);
+    b.addEventListener("click", function(){ noteForm.eventTime = t; syncNoteForm(); });
+    eq.appendChild(b);
+  });
+  var rp = $("noteRemindPresets"); rp.innerHTML = "";
+  REMIND_PRESETS.forEach(function(dd){
+    var b = document.createElement("button"); b.type = "button"; b.dataset.days = dd; b.textContent = dd === 0 ? "Đúng ngày" : dd + " ngày";
+    b.setAttribute("aria-label", dd === 0 ? "Nhắc đúng ngày (ghi chú)" : "Nhắc trước " + dd + " ngày (ghi chú)");
+    b.addEventListener("click", function(){ noteForm.remindDays = dd; syncNoteForm(); });
+    rp.appendChild(b);
+  });
+  var rq = $("noteRemindTimeQuick"); rq.innerHTML = "";
+  ["06:00","07:00","08:00","09:00","12:00","18:00","20:00","21:00"].forEach(function(t){
+    var b = document.createElement("button"); b.type = "button"; b.textContent = t; b.dataset.time = t; b.setAttribute("aria-label", "Chọn giờ nhắc cho ghi chú " + t);
+    b.addEventListener("click", function(){ noteForm.remindTime = t; syncNoteForm(); });
+    rq.appendChild(b);
+  });
+  var rs = $("noteRepeatSeg"); rs.innerHTML = "";
+  NOTE_REPEAT_OPTIONS.forEach(function(o){
+    var b = document.createElement("button"); b.type = "button"; b.dataset.repeat = o.id; b.setAttribute("aria-label", "Ghi chú lặp: " + o.label);
+    b.innerHTML = '<span class="ic">' + o.icon + '</span>' + o.label;
+    b.addEventListener("click", function(){ noteForm.repeatType = o.id; syncNoteForm(); });
+    rs.appendChild(b);
+  });
+  var ms = $("noteMethodSeg"); ms.innerHTML = "";
+  REMIND_METHODS.forEach(function(mm){
+    var b = document.createElement("button"); b.type = "button"; b.dataset.method = mm.id; b.setAttribute("aria-label", "Nhắc ghi chú bằng " + mm.label);
+    b.innerHTML = '<span class="ic">' + mm.icon + '</span>' + mm.label;
+    b.addEventListener("click", function(){ noteForm.remindMethod = mm.id; syncNoteForm(); });
+    ms.appendChild(b);
+  });
+}
+function syncNoteDayOptions(){
+  var max = noteForm.calendarType === "lunar" ? 30 : 31;
+  var daySel = $("n-day");
+  if (noteForm.day > max) noteForm.day = max;
+  daySel.innerHTML = "";
+  for (var d = 1; d <= max; d++){ var od = document.createElement("option"); od.value = d; od.textContent = d; daySel.appendChild(od); }
+  daySel.value = noteForm.day;
+}
+function syncNoteForm(){
+  if (!noteForm) return;
+  $("noteFormTitle").textContent = editingNoteId ? "Sửa ghi chú" : "Thêm ghi chú";
+  $("n-title").value = noteForm.title;
+  $("n-content").value = noteForm.content;
+  /* Date toggle */
+  $("nSegNoDate").className = !noteForm.hasDate ? "on-plain" : "";
+  $("nSegNoDate").setAttribute("aria-pressed", !noteForm.hasDate ? "true" : "false");
+  $("nSegHasDate").className = noteForm.hasDate ? "on-jade" : "";
+  $("nSegHasDate").setAttribute("aria-pressed", noteForm.hasDate ? "true" : "false");
+  $("noteDateFields").classList.toggle("hidden", !noteForm.hasDate);
+  $("nSegSolar").className = noteForm.calendarType === "solar" ? "on-solar" : "";
+  $("nSegSolar").setAttribute("aria-pressed", noteForm.calendarType === "solar" ? "true" : "false");
+  $("nSegLunar").className = noteForm.calendarType === "lunar" ? "on-lunar" : "";
+  $("nSegLunar").setAttribute("aria-pressed", noteForm.calendarType === "lunar" ? "true" : "false");
+  $("noteCalHint").textContent = noteForm.calendarType === "solar" ? "Dùng ngày dương cố định." : "Dùng ngày âm — app tự đổi sang dương lịch để đếm ngược và nhắc.";
+  $("noteDateLabel").textContent = noteForm.calendarType === "solar" ? "Ngày / tháng / năm / giờ (dương lịch)" : "Ngày / tháng / năm / giờ (âm lịch)";
+  syncNoteDayOptions();
+  $("n-month").value = noteForm.month;
+  $("n-year").value = noteForm.year;
+  $("n-event-time").value = noteForm.eventTime;
+  $("nClearEventTime").classList.toggle("hidden", !noteForm.eventTime);
+  $("nEventTimeState").classList.toggle("hidden", !!noteForm.eventTime);
+  document.querySelectorAll("#noteEventTimeQuick button").forEach(function(b){ b.classList.toggle("on", b.dataset.time === noteForm.eventTime); b.setAttribute("aria-pressed", b.dataset.time === noteForm.eventTime ? "true" : "false"); });
+  $("noteLeapWrap").classList.toggle("hidden", noteForm.calendarType !== "lunar");
+  $("noteAdvBox").classList.toggle("hidden", !noteShowAdvanced);
+  $("noteAdvToggle").textContent = noteShowAdvanced ? "▾ Ẩn tuỳ chọn nâng cao" : "▸ Tuỳ chọn nâng cao (tháng nhuận — thường không cần)";
+  $("noteAdvToggle").setAttribute("aria-expanded", noteShowAdvanced ? "true" : "false");
+  $("n-leap").checked = noteForm.isLeapMonth;
+  document.querySelectorAll("#noteRepeatSeg button").forEach(function(b){
+    var on = b.dataset.repeat === noteForm.repeatType;
+    b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  var repOpt = NOTE_REPEAT_OPTIONS.filter(function(o){ return o.id === noteForm.repeatType; })[0] || NOTE_REPEAT_OPTIONS[0];
+  $("noteRepeatHint").textContent = repOpt.hint;
+  /* Date preview */
+  var preview = null;
+  var y = noteForm.year ? parseInt(noteForm.year, 10) : new Date().getFullYear();
+  if (noteForm.hasDate && y && !isNaN(y)){
+    try {
+      if (noteForm.calendarType === "solar"){ var l = solarToLunar(noteForm.day, noteForm.month, y); preview = { solar: pad2(noteForm.day) + "/" + pad2(noteForm.month) + "/" + y, lunar: l.day + "/" + l.month + "/" + l.year + (l.leap ? " (nhuận)" : "") + " âm lịch" }; }
+      else {
+        var s = lunarToSolar(noteForm.day, noteForm.month, y, noteForm.isLeapMonth);
+        if (!s.year) preview = { solar: "Ngày âm này không có tháng nhuận tương ứng", lunar: noteForm.day + "/" + noteForm.month + (noteForm.isLeapMonth ? " nhuận" : "") + "/" + y + " âm lịch" };
+        else preview = { solar: formatSolar(s) + " dương lịch", lunar: noteForm.day + "/" + noteForm.month + (noteForm.isLeapMonth ? " nhuận" : "") + "/" + y + " âm lịch" };
+      }
+    } catch(e){ preview = null; }
+  }
+  $("noteFormPreview").classList.toggle("hidden", !preview);
+  if (preview){
+    $("notePreviewLunar").innerHTML = "🌙 <strong>" + esc(preview.lunar) + "</strong>";
+    $("notePreviewSolar").innerHTML = "☀️ <strong>" + esc(preview.solar) + "</strong>";
+  }
+  /* Reminder toggle */
+  $("nSegNoRemind").className = !noteForm.hasReminder ? "on-mute" : "";
+  $("nSegNoRemind").setAttribute("aria-pressed", !noteForm.hasReminder ? "true" : "false");
+  $("nSegRemind").className = noteForm.hasReminder ? "on-amber" : "";
+  $("nSegRemind").setAttribute("aria-pressed", noteForm.hasReminder ? "true" : "false");
+  /* seg buttons use .on-amber via class toggle in other segs; for this seg set background inline via class */
+  if (noteForm.hasReminder) $("nSegRemind").style.background = "#D97706", $("nSegRemind").style.color = "#fff";
+  else $("nSegRemind").style.background = "", $("nSegRemind").style.color = "";
+  if (!noteForm.hasReminder) $("nSegNoRemind").style.background = "#78716C", $("nSegNoRemind").style.color = "#fff";
+  else $("nSegNoRemind").style.background = "", $("nSegNoRemind").style.color = "";
+  $("noteRemindFields").classList.toggle("hidden", !noteForm.hasReminder);
+  var mh = $("noteModeHelp");
+  if (noteForm.hasReminder){
+    mh.className = "mode-help remind-on";
+    mh.innerHTML = noteForm.hasDate ? "🔔 Đang bật <strong>nhắc nhở</strong> — app sẽ nhắc trước ngày đã gắn, và bạn tải được file lịch .ics cho ghi chú này." : "🔔 Đang bật <strong>nhắc nhở</strong> — hãy gắn ngày lịch ở bước 2 để app tính được ngày nhắc.";
+  } else {
+    mh.className = "mode-help remind-off";
+    mh.innerHTML = "🔕 Đang để <strong>chỉ lưu để nhớ</strong> — ghi chú sẽ không phát thông báo nào. Bạn mở sổ ra là thấy.";
+  }
+  $("noteRemindNoDate").classList.toggle("hidden", !!(noteForm.hasReminder && noteForm.hasDate));
+  $("noteRemindControls").style.opacity = (noteForm.hasReminder && !noteForm.hasDate) ? ".45" : "";
+  document.querySelectorAll("#noteRemindPresets button").forEach(function(b){
+    var on = Number(b.dataset.days) === noteForm.remindDays;
+    b.classList.toggle("on-amber", on); b.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  if (document.activeElement !== $("n-remind-custom")) $("n-remind-custom").value = noteForm.remindDays;
+  $("noteRemindRange").value = Math.min(30, noteForm.remindDays);
+  document.querySelectorAll("#noteMethodSeg button").forEach(function(b){
+    var on = b.dataset.method === noteForm.remindMethod;
+    b.classList.toggle("on-amber", on); b.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  $("noteMethodHint").textContent = methodMeta(noteForm.remindMethod).hint;
+  $("n-remind-time").value = noteForm.remindTime;
+  var rts = $("noteRemindTimeState");
+  if (noteForm.remindTime){ rts.textContent = "✓ Sẽ nhắc lúc " + noteForm.remindTime + " ngày nhắc"; rts.className = "state-tag ok"; }
+  else { rts.textContent = "Chưa chọn giờ — hãy chọn giờ của bạn"; rts.className = "state-tag warn"; }
+  document.querySelectorAll("#noteRemindTimeQuick button").forEach(function(b){ b.classList.toggle("on-amber", b.dataset.time === noteForm.remindTime); b.setAttribute("aria-pressed", b.dataset.time === noteForm.remindTime ? "true" : "false"); });
+  /* Reminder preview */
+  var nr = null;
+  if (noteForm.hasDate && noteForm.hasReminder){
+    try {
+      var tempN = { hasDate: true, calendarType: noteForm.calendarType, day: noteForm.day, month: noteForm.month, year: noteForm.year ? parseInt(noteForm.year, 10) : null, isLeapMonth: noteForm.isLeapMonth ? 1 : 0, repeatType: noteForm.repeatType };
+      var pseudo = noteAsEvent(tempN);
+      var nx2 = pseudo ? getNextOccurrence(pseudo) : null;
+      if (nx2){ var rd = getReminderDate(nx2.date, noteForm.remindDays); nr = { nextSolarStr: formatSolar(nx2.solar), nextWeekday: WEEKDAYS[nx2.date.getDay()] || "", reminderDateStr: formatDateVN(rd), reminderWeekday: WEEKDAYS[rd.getDay()] || "", daysUntil: nx2.daysUntil }; }
+    } catch(e){ nr = null; }
+  }
+  $("noteRemindPreview").classList.toggle("hidden", !nr);
+  if (nr){
+    $("nrpNext").innerHTML = "📅 Ngày của ghi chú: <strong>" + nr.nextSolarStr + "</strong> (" + nr.nextWeekday + ")" + (nr.daysUntil >= 0 ? " — còn " + nr.daysUntil + " ngày" : "");
+    $("nrpDate").innerHTML = "🔔 Ngày sẽ nhắc: <strong style='color:var(--amber-text)'>" + nr.reminderDateStr + "</strong> (" + nr.reminderWeekday + ") — " + (noteForm.remindDays === 0 ? "đúng ngày" : "trước " + noteForm.remindDays + " ngày");
+    $("nrpMethod").innerHTML = methodMeta(noteForm.remindMethod).icon + " Cách nhắc: <strong>" + esc(methodLabel(noteForm.remindMethod)) + "</strong>" + (noteForm.remindTime ? ' lúc <strong>' + esc(noteForm.remindTime) + "</strong>" : ' <span style="font-weight:700;color:var(--amber-text)">— chưa chọn giờ nhắc</span>');
+  }
+  $("noteFormSave").textContent = editingNoteId ? "Lưu thay đổi" : "Lưu ghi chú";
+}
+function openAddNote(){
+  editingNoteId = null; noteForm = emptyNoteForm(); noteShowAdvanced = false;
+  $("noteFormError").classList.add("hidden");
+  $("noteOverlay").classList.remove("hidden"); syncNoteForm();
+  setTimeout(function(){ $("n-content").focus(); }, 50);
+}
+function openEditNote(n){
+  editingNoteId = n.id; noteForm = noteToForm(n);
+  noteShowAdvanced = n.isLeapMonth === 1;
+  $("noteFormError").classList.add("hidden");
+  $("noteOverlay").classList.remove("hidden"); syncNoteForm();
+}
+function closeNoteForm(){ $("noteOverlay").classList.add("hidden"); }
+function handleSaveNote(){
+  noteForm.title = $("n-title").value;
+  noteForm.content = $("n-content").value;
+  var err = $("noteFormError");
+  function fail(msg){ err.textContent = msg; err.classList.remove("hidden"); err.scrollIntoView({ block: "nearest" }); }
+  if (!noteForm.content.trim() && !noteForm.title.trim()){ fail("Bạn chưa viết gì cho ghi chú — hãy nhập tiêu đề hoặc nội dung."); return; }
+  if (!noteForm.content.trim()){ fail("Bạn chưa viết nội dung ghi chú."); return; }
+  if (noteForm.hasReminder && !noteForm.hasDate){ fail("Bạn đang bật nhắc nhở nhưng chưa gắn ngày lịch — hãy bật “Có gắn ngày” ở bước 2, hoặc chọn “Chỉ lưu để nhớ”."); return; }
+  if (noteForm.hasReminder && !noteForm.remindTime){ fail("Bạn đã bật nhắc nhở nhưng chưa chọn giờ nhắc — không có giờ mặc định, hãy tự chọn giờ ở bước 3."); return; }
+  if (noteForm.hasReminder && !/^([01]\d|2[0-3]):[0-5]\d$/.test(noteForm.remindTime)){ fail("Giờ nhắc chưa đúng định dạng — hãy chọn giờ từ ô chọn giờ."); return; }
+  if (noteForm.eventTime && !/^([01]\d|2[0-3]):[0-5]\d$/.test(noteForm.eventTime)){ fail("Giờ diễn ra chưa đúng định dạng — hãy chọn giờ từ ô chọn giờ hoặc để trống."); return; }
+  if (noteForm.hasDate && noteForm.repeatType === "none" && !noteForm.year){ fail("Ghi chú “chỉ một lần” cần điền năm — hoặc đổi sang “Mỗi năm” nếu muốn lặp hằng năm mà không cần năm."); return; }
+  err.classList.add("hidden");
+  var nowTs = Date.now();
+  var payload = { title: noteForm.title.trim(), content: noteForm.content.trim(), hasDate: !!noteForm.hasDate, calendarType: noteForm.calendarType, day: noteForm.day, month: noteForm.month, year: noteForm.hasDate && noteForm.year ? parseInt(noteForm.year, 10) : null, isLeapMonth: noteForm.isLeapMonth ? 1 : 0, eventTime: noteForm.hasDate && noteForm.eventTime ? noteForm.eventTime : null, repeatType: noteForm.repeatType, hasReminder: !!noteForm.hasReminder, remindDays: noteForm.remindDays, remindMethod: noteForm.remindMethod, remindTime: noteForm.hasReminder ? noteForm.remindTime : "" };
+  if (editingNoteId){
+    for (var i = 0; i < notes.length; i++) if (notes[i].id === editingNoteId){ notes[i] = Object.assign({}, notes[i], payload, { updatedAt: nowTs }); break; }
+    showToast("Đã lưu thay đổi ghi chú.");
+  } else {
+    payload.id = nextNoteId++; payload.createdAt = nowTs; payload.updatedAt = nowTs;
+    notes.push(payload);
+    showToast(payload.hasReminder ? "Đã lưu ghi chú — có nhắc nhở." : "Đã lưu ghi chú — chỉ lưu để nhớ, không thông báo.");
+  }
+  closeNoteForm(); renderNotes();
+}
+
 /* ============ Wiring ============ */
 document.addEventListener("DOMContentLoaded", function(){
   buildFormStatic();
+  buildNoteFormStatic();
   render();
   $("searchInput").addEventListener("input", function(e){ search = e.target.value; render(); });
   $("statRemindingBtn").addEventListener("click", function(){ filterRemind = filterRemind==="reminding" ? "all" : "reminding"; render(); });
   $("addMainBtn").addEventListener("click", openAdd);
+  /* Notes wiring */
+  $("addNoteMainBtn").addEventListener("click", openAddNote);
+  $("noteSearchInput").addEventListener("input", function(e){ noteSearch = e.target.value; renderNotes(); });
+  $("downloadNotesIcsBtn").addEventListener("click", function(){
+    var vevents = allEnrichedNotes().map(function(x){ return buildIcsForNote(x.note, x); }).filter(function(v){ return v !== null; });
+    if (vevents.length > 0){ downloadIcs("ghi-chu-nhac.ics", vevents); showToast("Đã tải file lịch nhắc cho ghi chú — mở bằng ứng dụng Lịch trên điện thoại nhé."); }
+  });
   $("downloadAllBtn").addEventListener("click", function(){
     var vevents = allEnriched().map(function(x){ return buildIcsForEvent(x.ev, x.next, x.reminder); }).filter(function(v){ return v!==null; });
     if (vevents.length>0){ downloadIcs("so-ngay-can-nho.ics", vevents); showToast("Đã tải file lịch nhắc — mở bằng ứng dụng Lịch trên điện thoại nhé."); }
@@ -1320,9 +1941,9 @@ document.addEventListener("DOMContentLoaded", function(){
   });
   /* Backup */
   $("exportJsonBtn").addEventListener("click", function(){
-    if (!events.length){ $("backupMsg").textContent = "Sổ đang trống — thêm ngày đầu tiên rồi sao lưu nhé."; return; }
-    downloadText("so-ngay-can-nho-sao-luu.json", JSON.stringify({ app:"so-ngay-can-nho", version:1, events: events }, null, 2), "application/json;charset=utf-8");
-    $("backupMsg").textContent = "Đã tải file sao lưu cho "+events.length+" ngày. Giữ file này để khôi phục lại khi cần.";
+    if (!events.length && !notes.length){ $("backupMsg").textContent = "Sổ đang trống — thêm ngày hoặc ghi chú đầu tiên rồi sao lưu nhé."; return; }
+    downloadText("so-ngay-can-nho-sao-luu.json", JSON.stringify({ app:"so-ngay-can-nho", version:2, events: events, notes: notes }, null, 2), "application/json;charset=utf-8");
+    $("backupMsg").textContent = "Đã tải file sao lưu cho " + events.length + " ngày và " + notes.length + " ghi chú. Giữ file này để khôi phục lại khi cần.";
   });
   $("importFile").addEventListener("change", function(e){
     var file = e.target.files && e.target.files[0];
@@ -1332,15 +1953,23 @@ document.addEventListener("DOMContentLoaded", function(){
       try {
         var data = JSON.parse(String(reader.result||""));
         var list = Array.isArray(data) ? data : data.events;
-        if (!Array.isArray(list)) throw new Error("bad");
+        if (!Array.isArray(list)) list = [];
         var cleaned = [];
         list.forEach(function(x){
           if (!x || !x.title || (x.calendarType!=="solar" && x.calendarType!=="lunar")) return;
           cleaned.push({ id: nextId++, title: String(x.title), category: CATEGORIES.some(function(c){return c.id===x.category;}) ? x.category : "khac", note: String(x.note||""), calendarType: x.calendarType, day: Math.min(31, Math.max(1, Number(x.day)||1)), month: Math.min(12, Math.max(1, Number(x.month)||1)), year: x.year ? Number(x.year) : null, isLeapMonth: x.isLeapMonth?1:0, isRecurring: x.repeatType==="none"?0:1, eventTime: x.eventTime||null, repeatType: ["none","monthly","yearly"].indexOf(x.repeatType)>=0 ? x.repeatType : "yearly", remindDays: Math.min(60, Math.max(0, Number(x.remindDays)||0)), remindMethod: ["notification","alarm","both"].indexOf(x.remindMethod)>=0 ? x.remindMethod : "both", remindTime: x.remindTime||"" });
         });
-        if (!cleaned.length){ $("backupMsg").textContent = "File không có ngày hợp lệ nào — sổ hiện tại vẫn giữ nguyên."; return; }
+        var rawNotes = (!Array.isArray(data) && Array.isArray(data.notes)) ? data.notes : [];
+        var cleanedNotes = [];
+        rawNotes.forEach(function(x){
+          if (!x || (!x.title && !x.content)) return;
+          var hasDate = !!x.hasDate && (x.calendarType==="solar" || x.calendarType==="lunar");
+          cleanedNotes.push({ id: nextNoteId++, title: String(x.title||""), content: String(x.content||""), hasDate: hasDate, calendarType: hasDate ? x.calendarType : "solar", day: Math.min(31, Math.max(1, Number(x.day)||1)), month: Math.min(12, Math.max(1, Number(x.month)||1)), year: x.year ? Number(x.year) : null, isLeapMonth: x.isLeapMonth?1:0, eventTime: x.eventTime||null, repeatType: x.repeatType==="yearly" ? "yearly" : "none", hasReminder: !!x.hasReminder && hasDate, remindDays: Math.min(60, Math.max(0, Number(x.remindDays)||0)), remindMethod: ["notification","alarm","both"].indexOf(x.remindMethod)>=0 ? x.remindMethod : "both", remindTime: x.remindTime||"", createdAt: Number(x.createdAt)||Date.now(), updatedAt: Number(x.updatedAt)||Number(x.createdAt)||Date.now() });
+        });
+        if (!cleaned.length && !cleanedNotes.length){ $("backupMsg").textContent = "File không có ngày hay ghi chú hợp lệ nào — sổ hiện tại vẫn giữ nguyên."; return; }
         events = events.concat(cleaned);
-        $("backupMsg").textContent = "Đã khôi phục thêm "+cleaned.length+" ngày từ file sao lưu.";
+        notes = notes.concat(cleanedNotes);
+        $("backupMsg").textContent = "Đã khôi phục thêm " + cleaned.length + " ngày và " + cleanedNotes.length + " ghi chú từ file sao lưu.";
         render();
       } catch(err){ $("backupMsg").textContent = "Không đọc được file này — hãy chọn đúng file sao lưu .json đã tải từ sổ."; }
       e.target.value = "";
@@ -1376,7 +2005,37 @@ document.addEventListener("DOMContentLoaded", function(){
   });
   $("remindRange").addEventListener("input", function(e){ form.remindDays = Number(e.target.value); syncForm(); });
   $("f-remind-time").addEventListener("change", function(e){ form.remindTime = e.target.value; syncForm(); });
-  document.addEventListener("keydown", function(e){ if (e.key==="Escape" && !$("formOverlay").classList.contains("hidden")) closeForm(); });
+  /* Note form wiring */
+  $("noteFormClose").addEventListener("click", closeNoteForm);
+  $("noteFormCancel").addEventListener("click", closeNoteForm);
+  $("noteScrim").addEventListener("click", closeNoteForm);
+  $("noteFormSave").addEventListener("click", handleSaveNote);
+  $("n-title").addEventListener("input", function(e){ noteForm.title = e.target.value; });
+  $("n-content").addEventListener("input", function(e){ noteForm.content = e.target.value; });
+  $("nSegNoDate").addEventListener("click", function(){ noteForm.hasDate = false; syncNoteForm(); });
+  $("nSegHasDate").addEventListener("click", function(){ noteForm.hasDate = true; syncNoteForm(); });
+  $("nSegSolar").addEventListener("click", function(){ noteForm.calendarType = "solar"; noteForm.isLeapMonth = false; syncNoteForm(); });
+  $("nSegLunar").addEventListener("click", function(){ noteForm.calendarType = "lunar"; syncNoteForm(); });
+  $("n-day").addEventListener("change", function(e){ noteForm.day = Number(e.target.value); syncNoteForm(); });
+  $("n-month").addEventListener("change", function(e){ noteForm.month = Number(e.target.value); syncNoteForm(); });
+  $("n-year").addEventListener("input", function(e){ noteForm.year = e.target.value; syncNoteForm(); });
+  $("n-event-time").addEventListener("change", function(e){ noteForm.eventTime = e.target.value; syncNoteForm(); });
+  $("nClearEventTime").addEventListener("click", function(){ noteForm.eventTime = ""; syncNoteForm(); });
+  $("noteAdvToggle").addEventListener("click", function(){ noteShowAdvanced = !noteShowAdvanced; syncNoteForm(); });
+  $("n-leap").addEventListener("change", function(e){ noteForm.isLeapMonth = e.target.checked; syncNoteForm(); });
+  $("nSegNoRemind").addEventListener("click", function(){ noteForm.hasReminder = false; syncNoteForm(); });
+  $("nSegRemind").addEventListener("click", function(){ noteForm.hasReminder = true; syncNoteForm(); });
+  $("noteRemindMinus").addEventListener("click", function(){ noteForm.remindDays = Math.max(0, noteForm.remindDays - 1); syncNoteForm(); });
+  $("noteRemindPlus").addEventListener("click", function(){ noteForm.remindDays = Math.min(60, noteForm.remindDays + 1); syncNoteForm(); });
+  $("n-remind-custom").addEventListener("input", function(e){
+    var v = Number(e.target.value);
+    if (!isNaN(v)) noteForm.remindDays = Math.min(60, Math.max(0, Math.floor(v)));
+    else if (e.target.value === "") noteForm.remindDays = 0;
+    syncNoteForm();
+  });
+  $("noteRemindRange").addEventListener("input", function(e){ noteForm.remindDays = Number(e.target.value); syncNoteForm(); });
+  $("n-remind-time").addEventListener("change", function(e){ noteForm.remindTime = e.target.value; syncNoteForm(); });
+  document.addEventListener("keydown", function(e){ if (e.key==="Escape" && !$("formOverlay").classList.contains("hidden")) closeForm(); if (e.key==="Escape" && !$("noteOverlay").classList.contains("hidden")) closeNoteForm(); });
 });
 </script>
 <script>
