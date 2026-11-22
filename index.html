@@ -361,6 +361,11 @@ input[type="range"]{width:100%;margin-top:.75rem;accent-color:#D97706;min-height
   .cal-dots{display:flex;gap:2px;justify-content:center;min-height:5px;margin-top:1px}
   .cal-hdot{width:5px;height:5px;border-radius:50%;background:var(--gold)}
   .cal-detail-holiday{color:var(--gold);font-weight:700;margin:.15rem 0}
+  .cal-odot{width:5px;height:5px;border-radius:50%;background:var(--jade)}
+  .cal-off{background:var(--ok-bg);color:var(--ok-text);border:1px solid var(--ok-border);border-radius:999px;padding:.05rem .5rem;font-size:.78rem;font-weight:700;white-space:nowrap}
+  .cal-legend{font-size:.8rem;color:var(--dim);margin:.6rem 0 0}
+  .cal-legend .cal-dot,.cal-legend .cal-hdot,.cal-legend .cal-odot{display:inline-block;vertical-align:middle;margin:0 3px 0 10px}
+  .cal-legend .cal-dot{margin-left:0}
 </style>
 </head>
 <body>
@@ -438,6 +443,7 @@ input[type="range"]{width:100%;margin-top:.75rem;accent-color:#D97706;min-height
     </div>
     <div class="cal-dow"><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span class="sun">CN</span></div>
     <div class="cal-grid" id="calGrid"></div>
+    <p class="cal-legend"><span class="cal-dot"></span>Ngày đã lưu<span class="cal-hdot"></span>Ngày lễ, tết<span class="cal-odot"></span>Ngày nghỉ lễ chính thức</p>
     <div class="cal-detail" id="calDetail"></div>
   </section>
 
@@ -2064,6 +2070,9 @@ var SOLAR_HOLIDAYS = {
 };
 var LUNAR_HOLIDAYS = {
   "1/1": "Tết Nguyên Đán",
+  "2/1": "Tết Nguyên Đán (mùng 2 Tết)",
+  "3/1": "Tết Nguyên Đán (mùng 3 Tết)",
+  "4/1": "Tết Nguyên Đán (mùng 4 Tết)",
   "15/1": "Rằm tháng Giêng (Tết Nguyên Tiêu)",
   "3/3": "Tết Hàn Thực",
   "10/3": "Giỗ Tổ Hùng Vương",
@@ -2074,19 +2083,22 @@ var LUNAR_HOLIDAYS = {
   "23/12": "Ông Công Ông Táo"
 };
 
+var OFFICIAL_SOLAR = { "1/1": 1, "30/4": 1, "1/5": 1, "2/9": 1 };
+var OFFICIAL_LUNAR = { "1/1": 1, "2/1": 1, "3/1": 1, "4/1": 1, "10/3": 1 };
+
 function holidayOn(y, m, d){
-  var names = [];
-  var sName = SOLAR_HOLIDAYS[d + "/" + m];
-  if (sName) names.push(sName);
+  var out = [];
+  var sKey = d + "/" + m;
+  if (SOLAR_HOLIDAYS[sKey]) out.push({ name: SOLAR_HOLIDAYS[sKey], off: !!OFFICIAL_SOLAR[sKey] });
   var lun = solarToLunar(d, m, y);
   if (!lun.leap){
-    var lName = LUNAR_HOLIDAYS[lun.day + "/" + lun.month];
-    if (lName) names.push(lName);
+    var lKey = lun.day + "/" + lun.month;
+    if (LUNAR_HOLIDAYS[lKey]) out.push({ name: LUNAR_HOLIDAYS[lKey], off: !!OFFICIAL_LUNAR[lKey] });
   }
   var nx = new Date(y, m - 1, d + 1);
   var nl = solarToLunar(nx.getDate(), nx.getMonth() + 1, nx.getFullYear());
-  if (nl.day === 1 && nl.month === 1 && !nl.leap) names.push("Giao thừa — ngày cuối năm âm lịch");
-  return names;
+  if (nl.day === 1 && nl.month === 1 && !nl.leap) out.push({ name: "Giao thừa — ngày cuối năm âm lịch", off: true });
+  return out;
 }
 
 function renderCalendar(){
@@ -2117,7 +2129,7 @@ function renderCalendar(){
     html += '<button type="button" class="' + cls + '" data-key="' + key + '">'
       + '<span class="' + sCls + '">' + cd + '</span>'
       + '<span class="' + lCls + '">' + lTxt + '</span>'
-      + '<span class="cal-dots">' + (titles.length ? '<span class="cal-dot"></span>' : '') + (hol.length ? '<span class="cal-hdot"></span>' : '') + '</span>'
+      + '<span class="cal-dots">' + (titles.length ? '<span class="cal-dot"></span>' : '') + (hol.length ? '<span class="' + (hol.some(function(h){ return h.off; }) ? 'cal-odot' : 'cal-hdot') + '"></span>' : '') + '</span>'
       + '</button>';
   }
   $("calGrid").innerHTML = html;
@@ -2134,7 +2146,7 @@ function renderCalDetail(){
   var html = '<p class="cal-detail-head">' + dowNames[dt.getDay()] + ", " + pad2(d) + "/" + pad2(m) + "/" + y
     + ' <span class="cal-detail-lunar">(Âm: ' + lun.day + "/" + lun.month + "/" + lun.year + (lun.leap ? " nhuận" : "") + ')</span></p>';
   var hol = holidayOn(y, m, d);
-  hol.forEach(function(name){ html += '<p class="cal-detail-holiday">🎉 ' + esc(name) + '</p>'; });
+  hol.forEach(function(h){ html += '<p class="cal-detail-holiday">🎉 ' + esc(h.name) + (h.off ? ' <span class="cal-off">🏖️ Được nghỉ làm</span>' : '') + '</p>'; });
   if (!titles.length && !hol.length) html += '<p class="cal-detail-empty">Ngày này chưa có gì được lưu.</p>';
   else if (titles.length) html += titles.map(function(t){ return '<p class="cal-detail-item">• ' + esc(t.title) + ' <span class="cal-detail-kind">' + t.kind + '</span></p>'; }).join("");
   $("calDetail").innerHTML = html;
