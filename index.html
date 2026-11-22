@@ -358,6 +358,9 @@ input[type="range"]{width:100%;margin-top:.75rem;accent-color:#D97706;min-height
   .cal-detail-empty{color:var(--dim);margin:0}
   .cal-detail-item{margin:.15rem 0}
   .cal-detail-kind{color:var(--dim);font-size:.82rem}
+  .cal-dots{display:flex;gap:2px;justify-content:center;min-height:5px;margin-top:1px}
+  .cal-hdot{width:5px;height:5px;border-radius:50%;background:var(--gold)}
+  .cal-detail-holiday{color:var(--gold);font-weight:700;margin:.15rem 0}
 </style>
 </head>
 <body>
@@ -2047,6 +2050,45 @@ function titlesOn(y, m, d){
   return out;
 }
 
+var SOLAR_HOLIDAYS = {
+  "1/1": "Tết Dương lịch",
+  "8/3": "Ngày Quốc tế Phụ nữ",
+  "30/4": "Ngày Giải phóng miền Nam, thống nhất đất nước",
+  "1/5": "Ngày Quốc tế Lao động",
+  "1/6": "Ngày Quốc tế Thiếu nhi",
+  "27/7": "Ngày Thương binh – Liệt sĩ",
+  "2/9": "Quốc khánh nước CHXHCN Việt Nam",
+  "20/10": "Ngày Phụ nữ Việt Nam",
+  "20/11": "Ngày Nhà giáo Việt Nam",
+  "25/12": "Lễ Giáng sinh"
+};
+var LUNAR_HOLIDAYS = {
+  "1/1": "Tết Nguyên Đán",
+  "15/1": "Rằm tháng Giêng (Tết Nguyên Tiêu)",
+  "3/3": "Tết Hàn Thực",
+  "10/3": "Giỗ Tổ Hùng Vương",
+  "15/4": "Lễ Phật Đản",
+  "5/5": "Tết Đoan Ngọ",
+  "15/7": "Lễ Vu Lan (Rằm tháng Bảy)",
+  "15/8": "Tết Trung Thu",
+  "23/12": "Ông Công Ông Táo"
+};
+
+function holidayOn(y, m, d){
+  var names = [];
+  var sName = SOLAR_HOLIDAYS[d + "/" + m];
+  if (sName) names.push(sName);
+  var lun = solarToLunar(d, m, y);
+  if (!lun.leap){
+    var lName = LUNAR_HOLIDAYS[lun.day + "/" + lun.month];
+    if (lName) names.push(lName);
+  }
+  var nx = new Date(y, m - 1, d + 1);
+  var nl = solarToLunar(nx.getDate(), nx.getMonth() + 1, nx.getFullYear());
+  if (nl.day === 1 && nl.month === 1 && !nl.leap) names.push("Giao thừa — ngày cuối năm âm lịch");
+  return names;
+}
+
 function renderCalendar(){
   var now = new Date();
   if (!calCursor) calCursor = { y: now.getFullYear(), m: now.getMonth() + 1 };
@@ -2063,6 +2105,7 @@ function renderCalendar(){
     var cy = cur.getFullYear(), cm = cur.getMonth() + 1, cd = cur.getDate();
     var lun = solarToLunar(cd, cm, cy);
     var titles = titlesOn(cy, cm, cd);
+    var hol = holidayOn(cy, cm, cd);
     var key = cy + "-" + cm + "-" + cd;
     var cls = "cal-cell";
     if (cm !== m) cls += " spill";
@@ -2074,7 +2117,7 @@ function renderCalendar(){
     html += '<button type="button" class="' + cls + '" data-key="' + key + '">'
       + '<span class="' + sCls + '">' + cd + '</span>'
       + '<span class="' + lCls + '">' + lTxt + '</span>'
-      + (titles.length ? '<span class="cal-dot"></span>' : '')
+      + '<span class="cal-dots">' + (titles.length ? '<span class="cal-dot"></span>' : '') + (hol.length ? '<span class="cal-hdot"></span>' : '') + '</span>'
       + '</button>';
   }
   $("calGrid").innerHTML = html;
@@ -2090,8 +2133,10 @@ function renderCalDetail(){
   var titles = titlesOn(y, m, d);
   var html = '<p class="cal-detail-head">' + dowNames[dt.getDay()] + ", " + pad2(d) + "/" + pad2(m) + "/" + y
     + ' <span class="cal-detail-lunar">(Âm: ' + lun.day + "/" + lun.month + "/" + lun.year + (lun.leap ? " nhuận" : "") + ')</span></p>';
-  if (!titles.length) html += '<p class="cal-detail-empty">Ngày này chưa có gì được lưu.</p>';
-  else html += titles.map(function(t){ return '<p class="cal-detail-item">• ' + esc(t.title) + ' <span class="cal-detail-kind">' + t.kind + '</span></p>'; }).join("");
+  var hol = holidayOn(y, m, d);
+  hol.forEach(function(name){ html += '<p class="cal-detail-holiday">🎉 ' + esc(name) + '</p>'; });
+  if (!titles.length && !hol.length) html += '<p class="cal-detail-empty">Ngày này chưa có gì được lưu.</p>';
+  else if (titles.length) html += titles.map(function(t){ return '<p class="cal-detail-item">• ' + esc(t.title) + ' <span class="cal-detail-kind">' + t.kind + '</span></p>'; }).join("");
   $("calDetail").innerHTML = html;
 }
 
