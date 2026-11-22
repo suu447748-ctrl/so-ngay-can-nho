@@ -1067,6 +1067,15 @@ function persistNow(){
   try {
     localStorage.setItem(LS_KEY, JSON.stringify({ events: events, notes: notes, nextId: nextId, nextNoteId: nextNoteId }));
   } catch (e) {}
+  try {
+    if (window.AndroidBridge && window.AndroidBridge.syncData) {
+      var bridgePayload = JSON.stringify({ events: events, notes: notes });
+      if (bridgePayload !== persistNow._lastBridge) {
+        persistNow._lastBridge = bridgePayload;
+        window.AndroidBridge.syncData(bridgePayload);
+      }
+    }
+  } catch (e) {}
 }
 (function hydrateFromLocal(){
   try {
