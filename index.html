@@ -2103,9 +2103,9 @@ function bookBlocks(){
   return list;
 }
 
-function setView(v){
+function setView(v, persist){
   calViewActive = (v === "cal");
-  try { localStorage.setItem(VIEW_KEY, v); } catch (e) {}
+  if (persist !== false){ try { localStorage.setItem(VIEW_KEY, v); } catch (e) {} }
   $("tabBook").classList.toggle("active", !calViewActive);
   $("tabCal").classList.toggle("active", calViewActive);
   $("tabBook").setAttribute("aria-selected", calViewActive ? "false" : "true");
@@ -2137,7 +2137,8 @@ document.addEventListener("DOMContentLoaded", function(){
   });
   var savedView = null;
   try { savedView = localStorage.getItem(VIEW_KEY); } catch (e) {}
-  if (savedView === "cal") setView("cal");
+  if (window.location.hash === "#lich") setView("cal", false);
+  else if (savedView === "cal") setView("cal");
   $("searchInput").addEventListener("input", function(e){ search = e.target.value; render(); });
   $("statRemindingBtn").addEventListener("click", function(){ filterRemind = filterRemind==="reminding" ? "all" : "reminding"; render(); });
   $("addMainBtn").addEventListener("click", openAdd);
