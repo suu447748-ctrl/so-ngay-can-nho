@@ -1060,6 +1060,32 @@ var noteDeleteConfirmId = null;
 var editingNoteId = null;
 var noteForm = null;
 var noteShowAdvanced = false;
+
+/* ============ Local persistence (added 2026-11-22) ============ */
+var LS_KEY = "so-ngay-can-nho-data-v1";
+function persistNow(){
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({ events: events, notes: notes, nextId: nextId, nextNoteId: nextNoteId }));
+  } catch (e) {}
+}
+(function hydrateFromLocal(){
+  try {
+    var raw = localStorage.getItem(LS_KEY);
+    if (!raw) return;
+    var data = JSON.parse(raw);
+    if (!data) return;
+    if (Array.isArray(data.events)) events = data.events;
+    if (Array.isArray(data.notes)) notes = data.notes;
+    var maxE = 0, maxN = 0, i;
+    for (i = 0; i < events.length; i++) if (typeof events[i].id === "number" && events[i].id > maxE) maxE = events[i].id;
+    for (i = 0; i < notes.length; i++) if (typeof notes[i].id === "number" && notes[i].id > maxN) maxN = notes[i].id;
+    nextId = Math.max(typeof data.nextId === "number" ? data.nextId : 1, maxE + 1);
+    nextNoteId = Math.max(typeof data.nextNoteId === "number" ? data.nextNoteId : 1, maxN + 1);
+  } catch (e) {}
+})();
+setInterval(persistNow, 1500);
+window.addEventListener("beforeunload", persistNow);
+document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") persistNow(); });
 var NOTE_FILTERS = [
   { id: "all", label: "Tất cả" },
   { id: "remind", label: "🔔 Có nhắc" },
