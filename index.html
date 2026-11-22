@@ -1086,6 +1086,25 @@ function persistNow(){
 setInterval(persistNow, 1500);
 window.addEventListener("beforeunload", persistNow);
 document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") persistNow(); });
+
+/* Hide intro + install panels when running as an installed app (added 2026-11-22) */
+function applyStandaloneChrome(){
+  try {
+    var standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+    if (!standalone) return;
+    var sn = document.querySelector(".share-note");
+    if (sn) sn.style.display = "none";
+    var ip = document.getElementById("installPanel");
+    if (ip) ip.style.display = "none";
+  } catch (e) {}
+}
+applyStandaloneChrome();
+document.addEventListener("DOMContentLoaded", applyStandaloneChrome);
+if (window.matchMedia) {
+  var mqStandalone = window.matchMedia("(display-mode: standalone)");
+  if (mqStandalone.addEventListener) mqStandalone.addEventListener("change", applyStandaloneChrome);
+}
+window.addEventListener("appinstalled", applyStandaloneChrome);
 var NOTE_FILTERS = [
   { id: "all", label: "Tất cả" },
   { id: "remind", label: "🔔 Có nhắc" },
