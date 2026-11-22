@@ -1099,7 +1099,7 @@ document.addEventListener("visibilitychange", function(){ if (document.visibilit
 /* Hide intro + install panels when running as an installed app (added 2026-11-22) */
 function applyStandaloneChrome(){
   try {
-    var standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+    var standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true || !!window.AndroidBridge;
     if (!standalone) return;
     var sn = document.querySelector(".share-note");
     if (sn) sn.style.display = "none";
