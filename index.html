@@ -330,6 +330,34 @@ input[type="range"]{width:100%;margin-top:.75rem;accent-color:#D97706;min-height
 .note-remind-box{border:2px solid var(--amber-border);background:var(--amber-bg);border-radius:16px;padding:1rem}
 .note-remind-box .rt{font-size:14px;font-weight:800;display:block}
 .note-remind-box .rd{font-size:12px;color:var(--dim);margin:.3rem 0 0;line-height:1.6}
+
+  /* View tabs + month calendar */
+  .view-tabs{display:flex;gap:.5rem;margin:0 0 1rem}
+  .view-tab{flex:1;padding:.65rem 1rem;border:1px solid var(--border);background:var(--surface);color:var(--dim);border-radius:999px;font-size:1rem;font-weight:600;cursor:pointer}
+  .view-tab.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .cal-head{display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem}
+  .cal-title{flex:1;text-align:center;margin:0}
+  .cal-nav{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:22px;line-height:1;cursor:pointer}
+  .cal-dow{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-weight:700;color:var(--dim);margin-bottom:.25rem}
+  .cal-dow .sun{color:var(--danger)}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+  .cal-cell{position:relative;display:flex;flex-direction:column;align-items:center;padding:.35rem 0 .3rem;border:1px solid transparent;border-radius:10px;background:transparent;cursor:pointer;font:inherit}
+  .cal-cell.spill{opacity:.38}
+  .cal-cell.today{border-color:var(--gold)}
+  .cal-cell.sel{background:var(--surface-warm);border-color:var(--accent)}
+  .cal-s{font-size:1.05rem;font-weight:600;color:#2F7FC4}
+  .cal-s.sun{color:var(--danger)}
+  .cal-s.marked{color:var(--accent);font-weight:800}
+  .cal-l{font-size:.72rem;color:var(--dim)}
+  .cal-l.special{color:var(--danger)}
+  .cal-l.marked{color:var(--accent);font-weight:700}
+  .cal-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);margin-top:1px}
+  .cal-detail{margin-top:.9rem;border-top:1px solid var(--border);padding-top:.7rem}
+  .cal-detail-head{font-weight:700;margin:0 0 .35rem}
+  .cal-detail-lunar{color:var(--dim);font-weight:400}
+  .cal-detail-empty{color:var(--dim);margin:0}
+  .cal-detail-item{margin:.15rem 0}
+  .cal-detail-kind{color:var(--dim);font-size:.82rem}
 </style>
 </head>
 <body>
@@ -391,6 +419,25 @@ input[type="range"]{width:100%;margin-top:.75rem;accent-color:#D97706;min-height
   </section>
 
   <!-- Hero -->
+    <!-- View tabs -->
+  <div class="view-tabs" role="tablist" aria-label="Chuyển chế độ xem">
+    <button type="button" class="view-tab active" id="tabBook" role="tab" aria-selected="true">📖 Sổ ngày</button>
+    <button type="button" class="view-tab" id="tabCal" role="tab" aria-selected="false">📅 Lịch tháng</button>
+  </div>
+
+  <!-- Month calendar: hidden until the Lịch tháng tab is chosen -->
+  <section class="panel hidden" id="calPanel" aria-label="Lịch tháng">
+    <div class="cal-head">
+      <button type="button" class="cal-nav" id="calPrev" aria-label="Tháng trước">‹</button>
+      <h3 class="cal-title" id="calTitle">Tháng</h3>
+      <button type="button" class="cal-nav" id="calNext" aria-label="Tháng sau">›</button>
+      <button type="button" class="btn sm" id="calTodayBtn">Hôm nay</button>
+    </div>
+    <div class="cal-dow"><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span class="sun">CN</span></div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-detail" id="calDetail"></div>
+  </section>
+
   <div id="heroSlot"></div>
 
   <!-- Reminder banner -->
@@ -1970,11 +2017,127 @@ function handleSaveNote(){
   closeNoteForm(); renderNotes();
 }
 
+/* ============ Month calendar view (hidden inside the app) ============ */
+var calCursor = null;
+var calSelected = null;
+var calViewActive = false;
+var VIEW_KEY = "sncnn-view-v1";
+
+function occursOn(ev, y, m, d){
+  var repeat = resolveRepeatType(ev);
+  if (ev.calendarType === "solar"){
+    if (repeat === "none") return !!ev.year && ev.year === y && ev.month === m && ev.day === d;
+    if (repeat === "monthly") return d === Math.min(ev.day, daysInSolarMonth(y, m));
+    return ev.month === m && d === Math.min(ev.day, daysInSolarMonth(y, m));
+  }
+  var lun = solarToLunar(d, m, y);
+  if ((ev.isLeapMonth === 1) !== !!lun.leap) return false;
+  if (repeat === "none") return !!ev.year && lun.year === ev.year && lun.month === ev.month && lun.day === ev.day;
+  if (repeat === "monthly") return lun.day === ev.day;
+  return lun.month === ev.month && lun.day === ev.day;
+}
+
+function titlesOn(y, m, d){
+  var out = [];
+  events.forEach(function(ev){ if (occursOn(ev, y, m, d)) out.push({ title: ev.title, kind: "Ngày cần nhớ" }); });
+  notes.forEach(function(n){
+    var p = noteAsEvent(n);
+    if (p && occursOn(p, y, m, d)) out.push({ title: noteDisplayTitle(n), kind: "Ghi chú" });
+  });
+  return out;
+}
+
+function renderCalendar(){
+  var now = new Date();
+  if (!calCursor) calCursor = { y: now.getFullYear(), m: now.getMonth() + 1 };
+  var y = calCursor.y, m = calCursor.m;
+  $("calTitle").textContent = "Tháng " + m + " " + y;
+  var first = new Date(y, m - 1, 1);
+  var startOffset = (first.getDay() + 6) % 7;
+  var start = new Date(y, m - 1, 1 - startOffset);
+  var todayKey = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+  if (!calSelected) calSelected = todayKey;
+  var html = "";
+  for (var i = 0; i < 42; i++){
+    var cur = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    var cy = cur.getFullYear(), cm = cur.getMonth() + 1, cd = cur.getDate();
+    var lun = solarToLunar(cd, cm, cy);
+    var titles = titlesOn(cy, cm, cd);
+    var key = cy + "-" + cm + "-" + cd;
+    var cls = "cal-cell";
+    if (cm !== m) cls += " spill";
+    if (key === todayKey) cls += " today";
+    if (key === calSelected) cls += " sel";
+    var sCls = "cal-s" + (titles.length ? " marked" : "") + (cur.getDay() === 0 ? " sun" : "");
+    var lTxt = (i % 7 === 0 || lun.day === 1) ? (lun.day + "/" + lun.month) : String(lun.day);
+    var lCls = "cal-l" + ((lun.day === 1 || lun.day === 15) ? " special" : "") + (titles.length ? " marked" : "");
+    html += '<button type="button" class="' + cls + '" data-key="' + key + '">'
+      + '<span class="' + sCls + '">' + cd + '</span>'
+      + '<span class="' + lCls + '">' + lTxt + '</span>'
+      + (titles.length ? '<span class="cal-dot"></span>' : '')
+      + '</button>';
+  }
+  $("calGrid").innerHTML = html;
+  renderCalDetail();
+}
+
+function renderCalDetail(){
+  var parts = calSelected.split("-");
+  var y = +parts[0], m = +parts[1], d = +parts[2];
+  var dt = new Date(y, m - 1, d);
+  var dowNames = ["Chủ nhật", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"];
+  var lun = solarToLunar(d, m, y);
+  var titles = titlesOn(y, m, d);
+  var html = '<p class="cal-detail-head">' + dowNames[dt.getDay()] + ", " + pad2(d) + "/" + pad2(m) + "/" + y
+    + ' <span class="cal-detail-lunar">(Âm: ' + lun.day + "/" + lun.month + "/" + lun.year + (lun.leap ? " nhuận" : "") + ')</span></p>';
+  if (!titles.length) html += '<p class="cal-detail-empty">Ngày này chưa có gì được lưu.</p>';
+  else html += titles.map(function(t){ return '<p class="cal-detail-item">• ' + esc(t.title) + ' <span class="cal-detail-kind">' + t.kind + '</span></p>'; }).join("");
+  $("calDetail").innerHTML = html;
+}
+
+function bookBlocks(){
+  var list = [];
+  ["heroSlot", "bannerSlot", "listSlot", "notesPanel"].forEach(function(id){ var el = $(id); if (el) list.push(el); });
+  var f = document.querySelector("div.filters"); if (f) list.push(f);
+  var b = document.querySelector('section[aria-label="Sao lưu và khôi phục sổ của bạn"]'); if (b) list.push(b);
+  return list;
+}
+
+function setView(v){
+  calViewActive = (v === "cal");
+  try { localStorage.setItem(VIEW_KEY, v); } catch (e) {}
+  $("tabBook").classList.toggle("active", !calViewActive);
+  $("tabCal").classList.toggle("active", calViewActive);
+  $("tabBook").setAttribute("aria-selected", calViewActive ? "false" : "true");
+  $("tabCal").setAttribute("aria-selected", calViewActive ? "true" : "false");
+  $("calPanel").classList.toggle("hidden", !calViewActive);
+  bookBlocks().forEach(function(el){ el.style.display = calViewActive ? "none" : ""; });
+  if (calViewActive) renderCalendar();
+}
+
 /* ============ Wiring ============ */
 document.addEventListener("DOMContentLoaded", function(){
   buildFormStatic();
   buildNoteFormStatic();
   render();
+  /* Calendar view wiring */
+  var _renderOrig = render;
+  render = function(){ _renderOrig(); if (calViewActive) renderCalendar(); };
+  $("tabBook").addEventListener("click", function(){ setView("book"); });
+  $("tabCal").addEventListener("click", function(){ setView("cal"); });
+  $("calPrev").addEventListener("click", function(){ if (!calCursor) calCursor = { y: new Date().getFullYear(), m: new Date().getMonth() + 1 }; calCursor.m--; if (calCursor.m < 1){ calCursor.m = 12; calCursor.y--; } renderCalendar(); });
+  $("calNext").addEventListener("click", function(){ if (!calCursor) calCursor = { y: new Date().getFullYear(), m: new Date().getMonth() + 1 }; calCursor.m++; if (calCursor.m > 12){ calCursor.m = 1; calCursor.y++; } renderCalendar(); });
+  $("calTodayBtn").addEventListener("click", function(){ var n = new Date(); calCursor = { y: n.getFullYear(), m: n.getMonth() + 1 }; calSelected = n.getFullYear() + "-" + (n.getMonth() + 1) + "-" + n.getDate(); renderCalendar(); });
+  $("calGrid").addEventListener("click", function(e){
+    var btn = e.target && e.target.closest ? e.target.closest("[data-key]") : null;
+    if (!btn) return;
+    calSelected = btn.getAttribute("data-key");
+    var p = calSelected.split("-"); calCursor = { y: +p[0], m: +p[1] };
+    renderCalendar();
+  });
+  var savedView = null;
+  try { savedView = localStorage.getItem(VIEW_KEY); } catch (e) {}
+  if (savedView === "cal") setView("cal");
   $("searchInput").addEventListener("input", function(e){ search = e.target.value; render(); });
   $("statRemindingBtn").addEventListener("click", function(){ filterRemind = filterRemind==="reminding" ? "all" : "reminding"; render(); });
   $("addMainBtn").addEventListener("click", openAdd);
