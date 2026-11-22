@@ -2066,6 +2066,7 @@ var SOLAR_HOLIDAYS = {
   "2/9": "Quốc khánh nước CHXHCN Việt Nam",
   "20/10": "Ngày Phụ nữ Việt Nam",
   "20/11": "Ngày Nhà giáo Việt Nam",
+  "24/11": "Ngày Văn hóa Việt Nam",
   "25/12": "Lễ Giáng sinh"
 };
 var LUNAR_HOLIDAYS = {
@@ -2083,8 +2084,57 @@ var LUNAR_HOLIDAYS = {
   "23/12": "Ông Công Ông Táo"
 };
 
-var OFFICIAL_SOLAR = { "1/1": 1, "30/4": 1, "1/5": 1, "2/9": 1 };
+var OFFICIAL_SOLAR = { "1/1": 1, "30/4": 1, "1/5": 1, "2/9": 1, "24/11": 1 };
 var OFFICIAL_LUNAR = { "1/1": 1, "2/1": 1, "3/1": 1, "4/1": 1, "10/3": 1 };
+
+var OFFICIAL_BREAKS = {
+  "2026-1-1": "Nghỉ Tết Dương lịch",
+  "2026-1-2": "Nghỉ Tết Dương lịch",
+  "2026-1-3": "Nghỉ Tết Dương lịch",
+  "2026-1-4": "Nghỉ Tết Dương lịch",
+  "2026-2-14": "Nghỉ Tết Nguyên Đán",
+  "2026-2-15": "Nghỉ Tết Nguyên Đán",
+  "2026-2-16": "Nghỉ Tết Nguyên Đán",
+  "2026-2-17": "Nghỉ Tết Nguyên Đán",
+  "2026-2-18": "Nghỉ Tết Nguyên Đán",
+  "2026-2-19": "Nghỉ Tết Nguyên Đán",
+  "2026-2-20": "Nghỉ Tết Nguyên Đán",
+  "2026-2-21": "Nghỉ Tết Nguyên Đán",
+  "2026-2-22": "Nghỉ Tết Nguyên Đán",
+  "2026-4-25": "Nghỉ Giỗ Tổ Hùng Vương",
+  "2026-4-26": "Nghỉ Giỗ Tổ Hùng Vương",
+  "2026-4-27": "Nghỉ bù Giỗ Tổ Hùng Vương",
+  "2026-4-30": "Nghỉ lễ 30/4 – 1/5",
+  "2026-5-1": "Nghỉ lễ 30/4 – 1/5",
+  "2026-5-2": "Nghỉ lễ 30/4 – 1/5",
+  "2026-5-3": "Nghỉ lễ 30/4 – 1/5",
+  "2026-8-29": "Nghỉ Quốc khánh",
+  "2026-8-30": "Nghỉ Quốc khánh",
+  "2026-8-31": "Nghỉ Quốc khánh",
+  "2026-9-1": "Nghỉ Quốc khánh",
+  "2026-9-2": "Nghỉ Quốc khánh",
+  "2027-1-1": "Nghỉ Tết Dương lịch",
+  "2027-1-2": "Nghỉ Tết Dương lịch",
+  "2027-1-3": "Nghỉ Tết Dương lịch",
+  "2027-2-4": "Nghỉ Tết Nguyên Đán",
+  "2027-2-5": "Nghỉ Tết Nguyên Đán",
+  "2027-2-6": "Nghỉ Tết Nguyên Đán",
+  "2027-2-7": "Nghỉ Tết Nguyên Đán",
+  "2027-2-8": "Nghỉ Tết Nguyên Đán",
+  "2027-2-9": "Nghỉ Tết Nguyên Đán",
+  "2027-2-10": "Nghỉ Tết Nguyên Đán",
+  "2027-4-16": "Nghỉ Giỗ Tổ Hùng Vương",
+  "2027-4-17": "Nghỉ Giỗ Tổ Hùng Vương",
+  "2027-4-18": "Nghỉ Giỗ Tổ Hùng Vương",
+  "2027-4-30": "Nghỉ lễ 30/4 – 1/5",
+  "2027-5-1": "Nghỉ lễ 30/4 – 1/5",
+  "2027-5-2": "Nghỉ lễ 30/4 – 1/5",
+  "2027-5-3": "Nghỉ bù ngày Quốc tế Lao động 1/5",
+  "2027-9-2": "Nghỉ Quốc khánh",
+  "2027-9-3": "Nghỉ Quốc khánh",
+  "2027-9-4": "Nghỉ Quốc khánh",
+  "2027-9-5": "Nghỉ Quốc khánh"
+};
 
 function holidayOn(y, m, d){
   var out = [];
@@ -2095,6 +2145,8 @@ function holidayOn(y, m, d){
     var lKey = lun.day + "/" + lun.month;
     if (LUNAR_HOLIDAYS[lKey]) out.push({ name: LUNAR_HOLIDAYS[lKey], off: !!OFFICIAL_LUNAR[lKey] });
   }
+  var brk = OFFICIAL_BREAKS[y + "-" + m + "-" + d];
+  if (brk && !out.some(function(h){ return h.off; })) out.push({ name: brk, off: true });
   var nx = new Date(y, m - 1, d + 1);
   var nl = solarToLunar(nx.getDate(), nx.getMonth() + 1, nx.getFullYear());
   if (nl.day === 1 && nl.month === 1 && !nl.leap) out.push({ name: "Giao thừa — ngày cuối năm âm lịch", off: true });
