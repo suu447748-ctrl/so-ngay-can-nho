@@ -366,6 +366,7 @@ input[type="range"]{width:100%;margin-top:.75rem;accent-color:#D97706;min-height
   .cal-legend{font-size:.8rem;color:var(--dim);margin:.6rem 0 0}
   .cal-legend .cal-dot,.cal-legend .cal-hdot,.cal-legend .cal-odot{display:inline-block;vertical-align:middle;margin:0 3px 0 10px}
   .cal-legend .cal-dot{margin-left:0}
+body.cal-only .top,body.cal-only .share-note,body.cal-only #installPanel,body.cal-only .add-bar,body.cal-only .stats,body.cal-only #icsPanel{display:none !important}
 </style>
 </head>
 <body>
@@ -2232,7 +2233,13 @@ document.addEventListener("DOMContentLoaded", function(){
   /* Calendar view wiring */
   var _renderOrig = render;
   render = function(){ _renderOrig(); if (calViewActive) renderCalendar(); };
-  $("tabBook").addEventListener("click", function(){ setView("book"); });
+  function enterCalOnly() {
+    document.body.classList.add("cal-only");
+    setView("cal", false);
+    window.scrollTo(0, 0);
+  }
+  window.sncnnWidgetCal = enterCalOnly;
+  $("tabBook").addEventListener("click", function(){ document.body.classList.remove("cal-only"); setView("book"); });
   $("tabCal").addEventListener("click", function(){ setView("cal"); });
   $("calPrev").addEventListener("click", function(){ if (!calCursor) calCursor = { y: new Date().getFullYear(), m: new Date().getMonth() + 1 }; calCursor.m--; if (calCursor.m < 1){ calCursor.m = 12; calCursor.y--; } renderCalendar(); });
   $("calNext").addEventListener("click", function(){ if (!calCursor) calCursor = { y: new Date().getFullYear(), m: new Date().getMonth() + 1 }; calCursor.m++; if (calCursor.m > 12){ calCursor.m = 1; calCursor.y++; } renderCalendar(); });
@@ -2246,7 +2253,7 @@ document.addEventListener("DOMContentLoaded", function(){
   });
   var savedView = null;
   try { savedView = localStorage.getItem(VIEW_KEY); } catch (e) {}
-  if (window.location.hash === "#lich") setView("cal", false);
+  if (window.location.hash === "#lich") enterCalOnly();
   else if (savedView === "cal") setView("cal");
   $("searchInput").addEventListener("input", function(e){ search = e.target.value; render(); });
   $("statRemindingBtn").addEventListener("click", function(){ filterRemind = filterRemind==="reminding" ? "all" : "reminding"; render(); });
