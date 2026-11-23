@@ -404,6 +404,9 @@ body.cal-only .top,body.cal-only .share-note,body.cal-only #installPanel,body.ca
   <div class="add-bar">
     <button type="button" class="add-main" id="addMainBtn" aria-label="Thêm ngày cần nhớ mới"><span class="plus">+</span> Thêm ngày cần nhớ</button>
   </div>
+  <div class="add-bar">
+    <button type="button" class="note-add-main" id="addNoteMainBtn" aria-label="Thêm ghi chú mới"><span style="font-size:20px;line-height:1">+</span> Thêm ghi chú</button>
+  </div>
 
   <!-- Stats -->
   <div class="stats">
@@ -415,8 +418,31 @@ body.cal-only .top,body.cal-only .share-note,body.cal-only #installPanel,body.ca
     </button>
   </div>
 
+
+  <!-- Hero -->
+    <!-- View tabs -->
+  <div class="view-tabs" role="tablist" aria-label="Chuyển chế độ xem">
+    <button type="button" class="view-tab active" id="tabBook" role="tab" aria-selected="true">📖 Sổ ngày</button>
+    <button type="button" class="view-tab" id="tabCal" role="tab" aria-selected="false">📅 Lịch tháng</button>
+    <button type="button" class="view-tab" id="tabNotes" role="tab" aria-selected="false">📝 Ghi chú</button>
+  </div>
+
+  <!-- Month calendar: hidden until the Lịch tháng tab is chosen -->
+  <section class="panel hidden" id="calPanel" aria-label="Lịch tháng">
+    <div class="cal-head">
+      <button type="button" class="cal-nav" id="calPrev" aria-label="Tháng trước">‹</button>
+      <h3 class="cal-title" id="calTitle">Tháng</h3>
+      <button type="button" class="cal-nav" id="calNext" aria-label="Tháng sau">›</button>
+      <button type="button" class="btn sm" id="calTodayBtn">Hôm nay</button>
+    </div>
+    <div class="cal-dow"><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span class="sun">CN</span></div>
+    <div class="cal-grid" id="calGrid"></div>
+    <p class="cal-legend"><span class="cal-dot"></span>Ngày đã lưu<span class="cal-hdot"></span>Ngày lễ, tết<span class="cal-odot"></span>Ngày nghỉ lễ chính thức</p>
+    <div class="cal-detail" id="calDetail"></div>
+  </section>
+
   <!-- Notes -->
-  <section class="panel notes-panel" id="notesPanel" aria-label="Ghi chú">
+  <section class="panel notes-panel hidden" id="notesPanel" aria-label="Ghi chú">
     <div class="notes-head">
       <div>
         <h3>📝 Ghi chú</h3>
@@ -424,7 +450,6 @@ body.cal-only .top,body.cal-only .share-note,body.cal-only #installPanel,body.ca
       </div>
       <span class="badge-count" id="noteCountBadge">0 ghi chú</span>
     </div>
-    <button type="button" class="note-add-main" id="addNoteMainBtn" aria-label="Thêm ghi chú mới"><span style="font-size:20px;line-height:1">+</span> Thêm ghi chú</button>
     <div class="note-stats" aria-label="Thống kê ghi chú">
       <div class="stat"><p class="n" id="noteStatTotal">0</p><p class="t">Ghi chú đã lưu</p></div>
       <div class="stat"><p class="n" style="color:#D97706" id="noteStatRemind">0</p><p class="t">Có nhắc nhở</p></div>
@@ -442,27 +467,6 @@ body.cal-only .top,body.cal-only .share-note,body.cal-only #installPanel,body.ca
       </div>
     </div>
     <div id="notesListSlot"></div>
-  </section>
-
-  <!-- Hero -->
-    <!-- View tabs -->
-  <div class="view-tabs" role="tablist" aria-label="Chuyển chế độ xem">
-    <button type="button" class="view-tab active" id="tabBook" role="tab" aria-selected="true">📖 Sổ ngày</button>
-    <button type="button" class="view-tab" id="tabCal" role="tab" aria-selected="false">📅 Lịch tháng</button>
-  </div>
-
-  <!-- Month calendar: hidden until the Lịch tháng tab is chosen -->
-  <section class="panel hidden" id="calPanel" aria-label="Lịch tháng">
-    <div class="cal-head">
-      <button type="button" class="cal-nav" id="calPrev" aria-label="Tháng trước">‹</button>
-      <h3 class="cal-title" id="calTitle">Tháng</h3>
-      <button type="button" class="cal-nav" id="calNext" aria-label="Tháng sau">›</button>
-      <button type="button" class="btn sm" id="calTodayBtn">Hôm nay</button>
-    </div>
-    <div class="cal-dow"><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span class="sun">CN</span></div>
-    <div class="cal-grid" id="calGrid"></div>
-    <p class="cal-legend"><span class="cal-dot"></span>Ngày đã lưu<span class="cal-hdot"></span>Ngày lễ, tết<span class="cal-odot"></span>Ngày nghỉ lễ chính thức</p>
-    <div class="cal-detail" id="calDetail"></div>
   </section>
 
   <div id="heroSlot"></div>
@@ -1996,7 +2000,7 @@ function handleSaveNote(){
     notes.push(payload);
     showToast(payload.hasReminder ? "Đã lưu ghi chú — có nhắc nhở." : "Đã lưu ghi chú — chỉ lưu để nhớ, không thông báo.");
   }
-  closeNoteForm(); renderNotes();
+  closeNoteForm(); renderNotes(); setView("notes");
 }
 
 /* ============ Month calendar view (hidden inside the app) ============ */
@@ -2179,7 +2183,7 @@ function renderCalDetail(){
 
 function bookBlocks(){
   var list = [];
-  ["heroSlot", "bannerSlot", "listSlot", "notesPanel"].forEach(function(id){ var el = $(id); if (el) list.push(el); });
+  ["heroSlot", "bannerSlot", "listSlot"].forEach(function(id){ var el = $(id); if (el) list.push(el); });
   document.querySelectorAll("div.filters").forEach(function(f){ list.push(f); });
   var b = document.querySelector('section[aria-label="Sao lưu và khôi phục sổ của bạn"]'); if (b) list.push(b);
   return list;
@@ -2187,14 +2191,19 @@ function bookBlocks(){
 
 function setView(v, persist){
   calViewActive = (v === "cal");
+  var notesViewActive = (v === "notes");
   if (persist !== false){ try { localStorage.setItem(VIEW_KEY, v); } catch (e) {} }
-  $("tabBook").classList.toggle("active", !calViewActive);
+  $("tabBook").classList.toggle("active", v === "book");
   $("tabCal").classList.toggle("active", calViewActive);
-  $("tabBook").setAttribute("aria-selected", calViewActive ? "false" : "true");
+  $("tabNotes").classList.toggle("active", notesViewActive);
+  $("tabBook").setAttribute("aria-selected", v === "book" ? "true" : "false");
   $("tabCal").setAttribute("aria-selected", calViewActive ? "true" : "false");
+  $("tabNotes").setAttribute("aria-selected", notesViewActive ? "true" : "false");
   $("calPanel").classList.toggle("hidden", !calViewActive);
-  bookBlocks().forEach(function(el){ el.style.display = calViewActive ? "none" : ""; });
+  $("notesPanel").classList.toggle("hidden", !notesViewActive);
+  bookBlocks().forEach(function(el){ el.style.display = (v === "book") ? "" : "none"; });
   if (calViewActive) renderCalendar();
+  if (notesViewActive) renderNotes();
 }
 
 /* ============ Wiring ============ */
@@ -2213,6 +2222,7 @@ document.addEventListener("DOMContentLoaded", function(){
   window.sncnnWidgetCal = enterCalOnly;
   $("tabBook").addEventListener("click", function(){ document.body.classList.remove("cal-only"); setView("book"); });
   $("tabCal").addEventListener("click", function(){ setView("cal"); });
+  $("tabNotes").addEventListener("click", function(){ document.body.classList.remove("cal-only"); setView("notes"); });
   $("calPrev").addEventListener("click", function(){ if (!calCursor) calCursor = { y: new Date().getFullYear(), m: new Date().getMonth() + 1 }; calCursor.m--; if (calCursor.m < 1){ calCursor.m = 12; calCursor.y--; } renderCalendar(); });
   $("calNext").addEventListener("click", function(){ if (!calCursor) calCursor = { y: new Date().getFullYear(), m: new Date().getMonth() + 1 }; calCursor.m++; if (calCursor.m > 12){ calCursor.m = 1; calCursor.y++; } renderCalendar(); });
   $("calTodayBtn").addEventListener("click", function(){ var n = new Date(); calCursor = { y: n.getFullYear(), m: n.getMonth() + 1 }; calSelected = n.getFullYear() + "-" + (n.getMonth() + 1) + "-" + n.getDate(); renderCalendar(); });
@@ -2227,6 +2237,7 @@ document.addEventListener("DOMContentLoaded", function(){
   try { savedView = localStorage.getItem(VIEW_KEY); } catch (e) {}
   if (window.location.hash === "#lich") enterCalOnly();
   else if (savedView === "cal") setView("cal");
+  else if (savedView === "notes") setView("notes");
   $("searchInput").addEventListener("input", function(e){ search = e.target.value; render(); });
   $("statRemindingBtn").addEventListener("click", function(){ filterRemind = filterRemind==="reminding" ? "all" : "reminding"; render(); });
   $("addMainBtn").addEventListener("click", openAdd);
