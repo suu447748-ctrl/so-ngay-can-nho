@@ -442,10 +442,6 @@ body.cal-only .top,body.cal-only .share-note,body.cal-only #installPanel,body.ca
       </div>
     </div>
     <div id="notesListSlot"></div>
-    <div class="btn-row hidden" id="noteIcsRow">
-      <button type="button" class="btn primary" id="downloadNotesIcsBtn">📅 Tải lịch nhắc cho ghi chú (.ics)</button>
-      <span class="hint11" style="margin:0;align-self:center">Đưa các ghi chú có nhắc vào Lịch điện thoại để chuông / thông báo kêu đúng giờ bạn đã chọn.</span>
-    </div>
   </section>
 
   <!-- Hero -->
@@ -501,8 +497,8 @@ body.cal-only .top,body.cal-only .share-note,body.cal-only #installPanel,body.ca
 
   <!-- Backup -->
   <section class="panel" aria-label="Sao lưu và khôi phục sổ của bạn">
-    <h3>💾 Sao lưu sổ của bạn</h3>
-    <p class="desc">Tải sổ thành một file để giữ riêng hoặc gửi cho người thân, và khôi phục lại từ file đó bất cứ lúc nào — file sao lưu gồm <strong>cả ngày cần nhớ lẫn ghi chú</strong>. File lịch .ics dùng để đưa lời nhắc vào Lịch điện thoại; file sao lưu này dùng để mang theo toàn bộ sổ.</p>
+    <h3>💾 Sao lưu & tải lên</h3>
+    <p class="desc">Tải sổ xuống thành một file để giữ riêng hoặc gửi cho người thân, và tải lên lại từ file đó bất cứ lúc nào — file sao lưu gồm <strong>cả ngày cần nhớ lẫn ghi chú</strong>.</p>
     <div class="btn-row">
       <button type="button" class="btn" id="exportJsonBtn">⬇️ Tải file sao lưu (.json)</button>
       <label class="btn" for="importFile" style="cursor:pointer">⬆️ Khôi phục từ file</label>
@@ -645,7 +641,7 @@ body.cal-only .top,body.cal-only .share-note,body.cal-only #installPanel,body.ca
             <p class="hint11">Không có giờ mặc định — bạn tự chọn giờ nhắc cho từng ngày. Chưa chọn giờ thì chưa lưu được.</p>
             <div class="quick" id="remindTimeQuick" role="group" aria-label="Chọn nhanh giờ nhắc"></div>
           </div>
-          <p class="hint11">Sau khi lưu, dùng nút <strong>“Tải lịch nhắc (.ics)”</strong> ở trang chính hoặc nút <strong>“📅 Lịch nhắc”</strong> trên thẻ ngày để đưa lời nhắc này vào Lịch điện thoại — tới giờ bạn đã chọn, điện thoại sẽ nhắc đúng cách bạn đã chọn và lặp lại mỗi tháng / mỗi năm nếu bạn đã đặt như vậy.</p>
+          <p class="hint11">Sau khi lưu, dùng nút <strong>“📅 Lịch nhắc”</strong> trên thẻ ngày để đưa lời nhắc này vào Lịch điện thoại — tới giờ bạn đã chọn, điện thoại sẽ nhắc đúng cách bạn đã chọn và lặp lại mỗi tháng / mỗi năm nếu bạn đã đặt như vậy.</p>
         </div>
 
         <div class="remind-preview hidden" id="remindPreview">
@@ -1432,11 +1428,6 @@ function renderNotes(){
     b.addEventListener("click", function(){ noteFilter = o.id; renderNotes(); });
     fc.appendChild(b);
   });
-  /* ICS row for notes */
-  var exportableNotes = enrichedAll.filter(function(x){ return x.note.hasReminder && x.next && x.reminder && x.next.daysUntil >= 0; });
-  $("noteIcsRow").classList.toggle("hidden", exportableNotes.length === 0);
-  var dnb = $("downloadNotesIcsBtn");
-  if (dnb) dnb.textContent = "📅 Tải lịch nhắc cho ghi chú (.ics) — " + exportableNotes.length + " ghi chú";
   /* List */
   var ls = $("notesListSlot");
   if (filtered.length === 0){
@@ -2242,10 +2233,6 @@ document.addEventListener("DOMContentLoaded", function(){
   /* Notes wiring */
   $("addNoteMainBtn").addEventListener("click", openAddNote);
   $("noteSearchInput").addEventListener("input", function(e){ noteSearch = e.target.value; renderNotes(); });
-  $("downloadNotesIcsBtn").addEventListener("click", function(){
-    var vevents = allEnrichedNotes().map(function(x){ return buildIcsForNote(x.note, x); }).filter(function(v){ return v !== null; });
-    if (vevents.length > 0){ downloadIcs("ghi-chu-nhac.ics", vevents); showToast("Đã tải file lịch nhắc cho ghi chú — mở bằng ứng dụng Lịch trên điện thoại nhé."); }
-  });
   /* Backup */
   $("exportJsonBtn").addEventListener("click", function(){
     if (!events.length && !notes.length){ $("backupMsg").textContent = "Sổ đang trống — thêm ngày hoặc ghi chú đầu tiên rồi sao lưu nhé."; return; }
