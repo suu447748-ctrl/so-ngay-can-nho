@@ -385,7 +385,7 @@ body.cal-only .top,body.cal-only .share-note,body.cal-only #installPanel,body.ca
     </div>
   </div>
 
-  <div class="share-note">👋 <strong>Bản chia sẻ:</strong> Ai có link này cũng mở và dùng được sổ riêng của mình. Hãy thêm ngày đầu tiên của bạn bên dưới — ghi một lần, app tự báo lại <strong>mỗi năm</strong>. Cần ghi nhớ điều gì thêm? Dùng mục <strong>📝 Ghi chú</strong> ở giữa trang: gắn ngày lịch + bật nhắc, hoặc chỉ lưu để nhớ mà không cần thông báo. Dùng nút <strong>Sao lưu</strong> ở cuối trang để tải sổ của bạn thành file và khôi phục lại khi cần.</div>
+  <div class="share-note">👋 <strong>Bản chia sẻ:</strong> Ai có link này cũng mở và dùng được sổ riêng của mình. Hãy thêm ngày đầu tiên của bạn bên dưới — ghi một lần, app tự báo lại <strong>mỗi năm</strong>. Cần ghi nhớ điều gì thêm? Dùng mục <strong>📝 Ghi chú</strong> ngay bên dưới: gắn ngày lịch + bật nhắc, hoặc chỉ lưu để nhớ mà không cần thông báo. Dùng nút <strong>Sao lưu</strong> ở cuối trang để tải sổ của bạn thành file và khôi phục lại khi cần.</div>
 
   <!-- Install to home screen -->
   <section class="panel install-panel" id="installPanel" aria-label="Cài app ra màn hình chính">
@@ -415,15 +415,36 @@ body.cal-only .top,body.cal-only .share-note,body.cal-only #installPanel,body.ca
     </button>
   </div>
 
-  <!-- ICS / notifications panel -->
-  <section class="panel hidden" id="icsPanel" aria-label="Cách nhắc trên điện thoại">
-    <h3>🔔⏰ Nhắc trên điện thoại: thông báo + báo thức</h3>
-    <p class="desc">Tải file lịch bên dưới rồi mở bằng ứng dụng Lịch trên điện thoại để thêm vào lịch — mỗi ngày nhắc sẽ có một sự kiện vào đúng <strong>giờ nhắc bạn đã tự chọn</strong> (không có giờ mặc định), kèm thông báo và chuông báo thức theo cách nhắc của từng ngày, và tự lặp lại <strong>mỗi tháng / mỗi năm</strong> nếu ngày đó được đặt lặp như vậy. Trong lúc trang đang mở, bật thêm thông báo trình duyệt để được nhắc ngay tại đây.</p>
-    <div class="btn-row">
-      <button type="button" class="btn primary" id="downloadAllBtn">📅 Tải lịch nhắc (.ics)</button>
-      <button type="button" class="btn hidden" id="enableNotifBtn">🔔 Bật thông báo khi trang mở</button>
-      <span class="state-tag ok hidden" id="notifGranted">✓ Thông báo trong trang: đã bật</span>
-      <span class="state-tag hidden" id="notifDenied">Thông báo trong trang đang bị chặn — file .ics vẫn nhắc qua Lịch điện thoại</span>
+  <!-- Notes -->
+  <section class="panel notes-panel" id="notesPanel" aria-label="Ghi chú">
+    <div class="notes-head">
+      <div>
+        <h3>📝 Ghi chú</h3>
+        <p class="desc">Ghi lại bất cứ điều gì cần nhớ. Mỗi ghi chú có thể <strong>gắn thêm ngày lịch</strong> (âm hoặc dương) để đếm ngược và <strong>bật nhắc nhở</strong> bằng thông báo / báo thức — hoặc <strong>chỉ lưu để nhớ, không thông báo</strong> gì cả.</p>
+      </div>
+      <span class="badge-count" id="noteCountBadge">0 ghi chú</span>
+    </div>
+    <button type="button" class="note-add-main" id="addNoteMainBtn" aria-label="Thêm ghi chú mới"><span style="font-size:20px;line-height:1">+</span> Thêm ghi chú</button>
+    <div class="note-stats" aria-label="Thống kê ghi chú">
+      <div class="stat"><p class="n" id="noteStatTotal">0</p><p class="t">Ghi chú đã lưu</p></div>
+      <div class="stat"><p class="n" style="color:#D97706" id="noteStatRemind">0</p><p class="t">Có nhắc nhở</p></div>
+      <div class="stat"><p class="n" id="noteStatPlain">0</p><p class="t">Chỉ lưu để nhớ</p></div>
+    </div>
+    <div class="filters" style="margin-top:1rem">
+      <div class="search">
+        <span class="ico" aria-hidden="true">🔍</span>
+        <input id="noteSearchInput" type="text" aria-label="Tìm kiếm ghi chú" placeholder="Tìm ghi chú theo tiêu đề, nội dung…" />
+      </div>
+      <div class="filter-line" role="group" aria-label="Lọc ghi chú">
+        <span class="lab">📝 Ghi chú:</span>
+        <div class="chips" id="noteFilterChips"></div>
+        <span class="cnt" id="noteFilteredCount"></span>
+      </div>
+    </div>
+    <div id="notesListSlot"></div>
+    <div class="btn-row hidden" id="noteIcsRow">
+      <button type="button" class="btn primary" id="downloadNotesIcsBtn">📅 Tải lịch nhắc cho ghi chú (.ics)</button>
+      <span class="hint11" style="margin:0;align-self:center">Đưa các ghi chú có nhắc vào Lịch điện thoại để chuông / thông báo kêu đúng giờ bạn đã chọn.</span>
     </div>
   </section>
 
@@ -477,39 +498,6 @@ body.cal-only .top,body.cal-only .share-note,body.cal-only #installPanel,body.ca
 
   <!-- List -->
   <div id="listSlot"></div>
-
-  <!-- Notes -->
-  <section class="panel notes-panel" id="notesPanel" aria-label="Ghi chú">
-    <div class="notes-head">
-      <div>
-        <h3>📝 Ghi chú</h3>
-        <p class="desc">Ghi lại bất cứ điều gì cần nhớ. Mỗi ghi chú có thể <strong>gắn thêm ngày lịch</strong> (âm hoặc dương) để đếm ngược và <strong>bật nhắc nhở</strong> bằng thông báo / báo thức — hoặc <strong>chỉ lưu để nhớ, không thông báo</strong> gì cả.</p>
-      </div>
-      <span class="badge-count" id="noteCountBadge">0 ghi chú</span>
-    </div>
-    <button type="button" class="note-add-main" id="addNoteMainBtn" aria-label="Thêm ghi chú mới"><span style="font-size:20px;line-height:1">+</span> Thêm ghi chú</button>
-    <div class="note-stats" aria-label="Thống kê ghi chú">
-      <div class="stat"><p class="n" id="noteStatTotal">0</p><p class="t">Ghi chú đã lưu</p></div>
-      <div class="stat"><p class="n" style="color:#D97706" id="noteStatRemind">0</p><p class="t">Có nhắc nhở</p></div>
-      <div class="stat"><p class="n" id="noteStatPlain">0</p><p class="t">Chỉ lưu để nhớ</p></div>
-    </div>
-    <div class="filters" style="margin-top:1rem">
-      <div class="search">
-        <span class="ico" aria-hidden="true">🔍</span>
-        <input id="noteSearchInput" type="text" aria-label="Tìm kiếm ghi chú" placeholder="Tìm ghi chú theo tiêu đề, nội dung…" />
-      </div>
-      <div class="filter-line" role="group" aria-label="Lọc ghi chú">
-        <span class="lab">📝 Ghi chú:</span>
-        <div class="chips" id="noteFilterChips"></div>
-        <span class="cnt" id="noteFilteredCount"></span>
-      </div>
-    </div>
-    <div id="notesListSlot"></div>
-    <div class="btn-row hidden" id="noteIcsRow">
-      <button type="button" class="btn primary" id="downloadNotesIcsBtn">📅 Tải lịch nhắc cho ghi chú (.ics)</button>
-      <span class="hint11" style="margin:0;align-self:center">Đưa các ghi chú có nhắc vào Lịch điện thoại để chuông / thông báo kêu đúng giờ bạn đã chọn.</span>
-    </div>
-  </section>
 
   <!-- Backup -->
   <section class="panel" aria-label="Sao lưu và khôi phục sổ của bạn">
@@ -1508,13 +1496,6 @@ function render(){
   sb.setAttribute("aria-pressed", filterRemind==="reminding"?"true":"false");
   $("filteredCount").textContent = filtered.length+" ngày";
 
-  /* ICS panel */
-  $("icsPanel").classList.toggle("hidden", exportable.length===0);
-  $("downloadAllBtn").textContent = "📅 Tải lịch nhắc (.ics) — "+exportable.length+" ngày";
-  $("enableNotifBtn").classList.toggle("hidden", notifPerm!=="default");
-  $("notifGranted").classList.toggle("hidden", notifPerm!=="granted");
-  $("notifDenied").classList.toggle("hidden", notifPerm!=="denied");
-
   /* Hero */
   var hs = $("heroSlot");
   if (heroItem && heroItem.next){
@@ -2208,7 +2189,7 @@ function renderCalDetail(){
 function bookBlocks(){
   var list = [];
   ["heroSlot", "bannerSlot", "listSlot", "notesPanel"].forEach(function(id){ var el = $(id); if (el) list.push(el); });
-  var f = document.querySelector("div.filters"); if (f) list.push(f);
+  document.querySelectorAll("div.filters").forEach(function(f){ list.push(f); });
   var b = document.querySelector('section[aria-label="Sao lưu và khôi phục sổ của bạn"]'); if (b) list.push(b);
   return list;
 }
@@ -2264,14 +2245,6 @@ document.addEventListener("DOMContentLoaded", function(){
   $("downloadNotesIcsBtn").addEventListener("click", function(){
     var vevents = allEnrichedNotes().map(function(x){ return buildIcsForNote(x.note, x); }).filter(function(v){ return v !== null; });
     if (vevents.length > 0){ downloadIcs("ghi-chu-nhac.ics", vevents); showToast("Đã tải file lịch nhắc cho ghi chú — mở bằng ứng dụng Lịch trên điện thoại nhé."); }
-  });
-  $("downloadAllBtn").addEventListener("click", function(){
-    var vevents = allEnriched().map(function(x){ return buildIcsForEvent(x.ev, x.next, x.reminder); }).filter(function(v){ return v!==null; });
-    if (vevents.length>0){ downloadIcs("so-ngay-can-nho.ics", vevents); showToast("Đã tải file lịch nhắc — mở bằng ứng dụng Lịch trên điện thoại nhé."); }
-  });
-  $("enableNotifBtn").addEventListener("click", function(){
-    if (!("Notification" in window)){ notifPerm = "unsupported"; render(); return; }
-    Notification.requestPermission().then(function(p){ notifPerm = p; render(); }).catch(function(){ notifPerm = Notification.permission; render(); });
   });
   /* Backup */
   $("exportJsonBtn").addEventListener("click", function(){
