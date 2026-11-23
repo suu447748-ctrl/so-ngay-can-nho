@@ -23,10 +23,10 @@
     }
   ],
   "lang": "vi",
-  "name": "Sổ Ngày Cần Nhớ",
+  "name": "Không Cần Nhớ",
   "orientation": "portrait",
   "scope": "./",
-  "short_name": "Ngày Cần Nhớ",
+  "short_name": "Không Cần Nhớ",
   "start_url": "./index.html",
   "theme_color": "#9B2226"
 }
